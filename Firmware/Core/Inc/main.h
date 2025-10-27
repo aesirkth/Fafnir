@@ -59,11 +59,10 @@ extern const uint16_t solenoidDetectPins[3];
 #define MOTOR_TIMER_CHANNEL TIM_CHANNEL_1
 
 void setPWM(TIM_HandleTypeDef *timer_handle, uint32_t timer_channel, float duty);
-void setMotorSpeed(float throttle);
-void zeroServo(void);
+void servoZero(void);
 void servoRotate(float angle);
-void solenoidActuate(uint8_t state);
-void solenoidDetect(void);
+void pyroActuate(uint8_t state);
+void pyroDetect(void);
 void can_send_std(uint16_t id, const uint8_t *data, uint8_t len);
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t it);
 uint8_t getDataLength(FDCAN_RxHeaderTypeDef *hdr);

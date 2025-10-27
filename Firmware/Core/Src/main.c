@@ -45,6 +45,7 @@ FDCAN_HandleTypeDef hfdcan1;
 
 TIM_HandleTypeDef htim3;
 
+
 /* USER CODE BEGIN PV */
 
 FDCAN_TxHeaderTypeDef TxHeader;
@@ -60,6 +61,36 @@ uint8_t solenoidState = 0;
 volatile bool servoZeroRequested = false;
 volatile bool servoRotateRequested = false;
 volatile float servoAngle = 0.0f;
+
+
+typedef enum {
+    STATE_IDLE,
+    STATE_INIT,
+    STATE_READY,
+    STATE_ACTUATE
+} State;
+
+typedef enum {
+    CMD_NONE,
+    CMD_SERVO_ZERO,
+    CMD_SERVO_ROTATE,
+    CMD_PYRO_ACTUATE,
+    CMD_PYRO_DISABLE
+} CommandType;
+
+typedef struct {
+    CommandType type;
+    uint8_t pyroIndex;
+    uint16_t angle;
+} Command;
+
+State servoState = STATE_IDLE;
+State pyroState[NUM_PYROS] = {STATE_IDLE, STATE_IDLE, STATE_IDLE};
+uint8_t pyroMask = 0b000;
+uint16_t targetAngle = 0;
+
+
+
 
 /* USER CODE END PV */
 
@@ -125,34 +156,12 @@ int main(void)
 
 
 
-  /* zeroServo(): DLC = 0 */
-  //uint8_t zero_cmd[1] = {1};
-  //can_send_std(CAN_ID_SERVO_ZERO, zero_cmd, 1);
-
-
-
-  /* servoRotate(+90°): D0 = 1 (CW/+), D1 = 90 */
-  //uint8_t rot_cmd[2] = { 1, 90 };
-  //can_send_std(CAN_ID_SERVO_ROTATE, rot_cmd, 2);
-
-
-
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1) {
 
-	  if (servoZeroRequested) {
-	        zeroServo();
-	        servoZeroRequested = false;
-	    }
-
-	    if (servoRotateRequested) {
-	        servoRotate(servoAngle);
-	        servoRotateRequested = false;
-	    }
 
 
     /* USER CODE END WHILE */
@@ -423,6 +432,94 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 
+void handleServo(void) {
+    switch (servoState) {
+        case STATE_IDLE:
+            //Do nothing until we receive some initial command
+            break;
+
+        case STATE_INIT:
+            setServoZero();
+            servoState = STATE_READY;
+            break;
+
+        case STATE_READY:
+            // Wait for rotation command
+            break;
+
+        case STATE_ACTUATE:
+            rotateServo(targetAngle);
+            servoState = STATE_READY;
+            break;
+    }
+}
+
+void processCommand(Command cmd) {
+    switch (cmd.type) {
+        case CMD_SERVO_ZERO:
+            servoState = STATE_INIT;
+            break;
+
+        case CMD_SERVO_ROTATE:
+            targetAngle = cmd.angle;
+            if (servoState == STATE_READY)
+                servoState = STATE_ACTUATE;
+            break;
+
+        case CMD_PYRO_ACTUATE:
+            if (cmd.index < NUM_PYROS && pyroState[cmd.index] == STATE_READY)
+                pyroState[cmd.index] = STATE_ACTUATE;
+            break;
+
+        case CMD_PYRO_DISABLE:
+            if (cmd.index < NUM_PYROS)
+                pyroState[cmd.index] = STATE_IDLE;
+            break;
+
+        default:
+            break;
+    }
+}
+
+bool systemReady(void) {
+    bool ready = (servoState == STATE_READY);
+    for (int i = 0; i < NUM_PYROS; i++)
+        ready &= (pyroState[i] == STATE_READY);
+    return ready;
+}
+
+
+void handlePyro(int i) {
+    switch (pyroState[i]) {
+        case STATE_IDLE:
+            //Do nothing until we receive some initial command
+            break;
+
+        case STATE_INIT:
+            setPyroTransistor(i, 0);
+            if (readContinuityPin(i) == 0) {
+                pyroState[i] = STATE_READY;
+                printf("[Pyro %d] Continuity OK\n", i);
+            }
+            break;
+
+        case STATE_READY:
+            // WAit for actuation command
+            break;
+
+        case STATE_ACTUATE:
+            setPyroTransistor(i, 1);
+            if (actuationComplete(i)) {
+                setPyroTransistor(i, 0);
+                pyroState[i] = STATE_INIT;  // continuity check
+                printf("[Pyro %d] Actuation complete\n", i);
+            }
+            break;
+    }
+}
+
+
+
 
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t it)
 {
@@ -493,31 +590,13 @@ uint8_t getDataLength(FDCAN_RxHeaderTypeDef *hdr) {
 }
 
 
-void solenoidActuate(uint8_t state) {
-//if 'state' = 0b101, then solenoidPin[1] and solenoidPin[3] will activate.
-//if 'state' = 0b011 then solenoidPin[2] and solenoidPin[3] will activate.
-
-
-	for (int i = 0; i<3; i++) {
-		if (state & (1<<i)) {
-			HAL_GPIO_WritePin(GPIOA, solenoidPins[i], GPIO_PIN_SET);
-		} else {
-			HAL_GPIO_WritePin(GPIOA, solenoidPins[i], GPIO_PIN_RESET);
-		}
-	}
-
+void pyroActuate(uint8_t state) {
 
 }
 
-void solenoidDetect(void) { //This only checks continuity for solenoids that are off
+void pyroContinuity(void) {
 
-	if(solenoidState & (0<<i)) {
-		//HAL GPIO Read pin
 
-	}
-
-//Continuity checking
-//HIGH == no continuity, LOW == continuity
 
 }
 
@@ -529,7 +608,7 @@ void setPWM(TIM_HandleTypeDef *timer_handle, uint32_t timer_channel, float duty)
     __HAL_TIM_SET_COMPARE(timer_handle, timer_channel, ccr);
 }
 
-void zeroServo(void) {
+void servoZero(void) {
 	HAL_TIM_PWM_Start(&MOTOR_TIMER_HANDLE, MOTOR_TIMER_CHANNEL);
 	servoRotate(0.0f);
 }
