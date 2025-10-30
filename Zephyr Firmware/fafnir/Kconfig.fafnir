@@ -1,2 +1,0 @@
-config BOARD_FAFNIR
-	select SOC_STM32U575XX

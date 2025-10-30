@@ -25,53 +25,6 @@
 		};
     };
 
-    pyros: pyro_channels {
-        compatible = "gpio-leds";
-        
-        pyro0: pyro0 {
-            gpios = <&gpioa 0 GPIO_ACTIVE_HIGH>;
-            label = "Pyro 0";
-        };
-        pyro1: pyro1 {
-            gpios = <&gpioa 1 GPIO_ACTIVE_HIGH>;
-            label = "Pyro 1";
-        };
-        pyro2: pyro2 {
-            gpios = <&gpioa 2 GPIO_ACTIVE_HIGH>;
-            label = "Pyro 2";
-        };
-    };
-
-    continuity: continuity_channels {
-        compatible = "gpio-keys";
-
-        cont0: cont0 {
-            gpios = <&gpiob 0 (GPIO_ACTIVE_LOW)>;
-            label = "Continuity 0";
-        };
-        cont1: cont1 {
-            gpios = <&gpiob 1 (GPIO_ACTIVE_LOW)>;
-            label = "Continuity 1";
-        };
-        cont2: cont2 {
-            gpios = <&gpiob 2 (GPIO_ACTIVE_LOW)>;
-            label = "Continuity 2";
-        };
-    };
-
-    buzzer: buzzer {
-        compatible = "gpio-leds";
-        gpios = <&gpioc 3 GPIO_ACTIVE_HIGH>;
-        label = "Buzzer";
-    };
-
-
-    // servo: servo_motor {
-    //     compatible = "pwm-leds";
-    //     pwms = <&tim3 1 PWM_POLARITY_NORMAL>;
-    //     label = "Servo Motor";
-    // };
-
 };
 
 &clk_hse {
@@ -96,13 +49,6 @@
 	apb2-prescaler = <1>;
 	apb3-prescaler = <1>;
 };
-
-// &tim3 {
-// 	status = "okay";
-// 	pinctrl-0 = <&tim3_ch1_pa6>;
-// 	pinctrl-names = "default";
-// };
-
 
 // &fdcan1 {
 // 	clocks = <&rcc STM32_CLOCK_BUS_APB1_2 0x00000200>,

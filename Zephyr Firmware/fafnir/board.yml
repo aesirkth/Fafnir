@@ -1,6 +1,0 @@
-board:
-  name: fafnir
-  full_name: fafnir propulsion engine controller
-  vendor: aesir
-  socs:
-    - name: stm32u575xx
