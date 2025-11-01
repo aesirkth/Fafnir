@@ -60,8 +60,8 @@ all: main-build
 main-build: FAFNIR.elf secondary-outputs
 
 # Tool invocations
-FAFNIR.elf FAFNIR.map: $(OBJS) $(USER_OBJS) C:\Users\alexm\Desktop\Aesir\FAFNIR\ CODE\STM32U575CGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "FAFNIR.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m33 -T"C:\Users\alexm\Desktop\Aesir\FAFNIR CODE\STM32U575CGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FAFNIR.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+FAFNIR.elf FAFNIR.map: $(OBJS) $(USER_OBJS) C:\Users\Alex\Fafnir\Firmware\STM32U575CGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "FAFNIR.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m33 -T"C:\Users\Alex\Fafnir\Firmware\STM32U575CGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FAFNIR.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv5-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

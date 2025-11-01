@@ -34,6 +34,8 @@ extern "C" {
 #include <stdio.h>
 #include <stdbool.h>
 
+/* CAN commands */
+
 #define CAN_ID_SERVO_ZERO         0x702  //
 #define CAN_ID_SERVO_ROTATE       0x703  // D0: dir 0/1, D1: angle 0..270
 #define CAN_ID_SOLENOID_ACTUATE   0x704  // D0: bitmask (A8..A10)
@@ -41,28 +43,43 @@ extern "C" {
 #define CAN_ID_LED 				  0x706
 
 
-#define SOLENOID_PIN_1 8
-#define SOLENOID_PIN_2 9
-#define SOLENOID_PIN_3 10
 
-#define SOL_PIN_1_DETECT 15
-#define SOL_PIN_2_DETECT 14
-#define SOL_PIN_3_DETECT 13
+/* Pyro Channels */
 
+#define NUM_PYROS 3
 
+extern GPIO_TypeDef* const pyroPort;
+extern const uint16_t pyroPins[NUM_PYROS];
 
-extern const uint16_t solenoidPins[3];
-extern const uint16_t solenoidDetectPins[3];
+extern GPIO_TypeDef* const pyroDetectPort;
+extern const uint16_t pyroDetectPins[NUM_PYROS];
 
 
+/* motor stuff */
 #define MOTOR_TIMER_HANDLE htim3
 #define MOTOR_TIMER_CHANNEL TIM_CHANNEL_1
 
+
+/* Motor functions */
 void setPWM(TIM_HandleTypeDef *timer_handle, uint32_t timer_channel, float duty);
 void servoZero(void);
 void servoRotate(float angle);
-void pyroActuate(uint8_t state);
-void pyroDetect(void);
+
+/* Pyro channel functions */
+void pyroActuate(uint8_t index, uint8_t state);
+uint8_t pyroDetect(uint8_t index);
+
+
+/* State machine functions  */
+uint8_t systemIdle(void);
+uint8_t systemReady(void);
+void handleServo(void);
+void handlePyro(int i);
+
+//not bothered to declare everything, will do some other time
+
+
+/* CAN functions */
 void can_send_std(uint16_t id, const uint8_t *data, uint8_t len);
 void HAL_FDCAN_RxFifo0Callback(FDCAN_HandleTypeDef *hfdcan, uint32_t it);
 uint8_t getDataLength(FDCAN_RxHeaderTypeDef *hdr);
