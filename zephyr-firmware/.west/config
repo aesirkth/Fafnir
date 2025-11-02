@@ -1,5 +1,5 @@
 [manifest]
-path = example-application
+path = fafnir
 file = west.yml
 
 [zephyr]
