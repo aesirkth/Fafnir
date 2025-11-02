@@ -30,7 +30,7 @@
 		status = "okay";
 
 		motor: motor {
-			pwms = <&pwm2 4 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+			pwms = <&pwm3 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
 		};
 	};
 
@@ -40,7 +40,7 @@
 	st,prescaler = <90>;
 	status = "okay";
 
-	pwm2: pwm {
+	pwm3: pwm {
 		status = "okay";
 		pinctrl-0 = <&tim3_ch1_pa6>;
 		pinctrl-names = "default";

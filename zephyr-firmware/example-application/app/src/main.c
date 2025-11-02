@@ -45,7 +45,7 @@ int main(void)
 		return 0;
 	}
 
-	ret = pwm_set_dt(&pwm_motor, 20000000, 6000000);
+	ret = pwm_set_dt(&pwm_motor, 600000000, 1000000);
 
 	while (1) {
 		ret = gpio_pin_toggle_dt(&led);
