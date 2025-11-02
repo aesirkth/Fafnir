@@ -25,16 +25,67 @@
 		};
     };
 
-    pwmleds: pwmleds {
+	pyro {
+        compatible = "gpio-leds";
+        
+        pyro0: pyro_0 {
+			gpios = <&gpioa 8 GPIO_ACTIVE_HIGH>;
+			label = "Pyro Actuate 0;
+		};
+
+		  pyro1: pyro_1 {
+			gpios = <&gpioa 9 GPIO_ACTIVE_HIGH>;
+			label = "Pyro Actuate 1;
+		};
+
+		  pyro2: pyro_2 {
+			gpios = <&gpioa 10 GPIO_ACTIVE_HIGH>;
+			label = "Pyro Actuate 2;
+		};
+
+};
+
+	pyroSense {
+        compatible = "gpio-keys";
+        
+        pyro0_sense: pyro_0_sense {
+			gpios = <&gpiob 15 GPIO_ACTIVE_HIGH>;
+			label = "Pyro Sense 0;
+		};
+
+		  pyro1_sense: pyro_1_sense {
+			gpios = <&gpioa 14 GPIO_ACTIVE_HIGH>;
+			label = "Pyro Sense 1;
+		};
+
+		  pyro2_sense: pyro_2_sense {
+			gpios = <&gpiob 13 GPIO_ACTIVE_HIGH>;
+			label = "Pyro Sense 2;
+		};
+	};
+
+
+    servo {
 		compatible = "pwm-leds";
 		status = "okay";
 
-		motor: motor {
+		servo: servo {
 			pwms = <&pwm3 1 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
 		};
 	};
 
+
+	buzzer {
+		compatible = "pwm-leds";
+		status = "okay";
+
+		buzzer: buzzer {
+			pwms = <&pwm4 2 PWM_MSEC(20) PWM_POLARITY_NORMAL>;
+		};
+	};
+
 };
+
 
 &timers3 {
     st,prescaler = <900>;
@@ -43,6 +94,17 @@
 	pwm3: pwm {
 		status = "okay";
 		pinctrl-0 = <&tim3_ch1_pa6>;
+		pinctrl-names = "default";
+	};
+};
+
+&timers4 {
+    st,prescaler = <900>;
+	status = "okay";
+
+	pwm4: pwm {
+		status = "okay";
+		pinctrl-0 = <&tim4_ch2_pb7>;
 		pinctrl-names = "default";
 	};
 };
