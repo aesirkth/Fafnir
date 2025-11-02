@@ -20,8 +20,7 @@ void servoRotate(float angle);
 
 /* Pyro channel functions */
 void pyroActuate(uint8_t index, uint8_t state);
-uint8_t pyroDetect(uint8_t index);
-
+uint8_t pyroSense(uint8_t index);
 
 /* State machine functions  */
 uint8_t systemIdle(void);

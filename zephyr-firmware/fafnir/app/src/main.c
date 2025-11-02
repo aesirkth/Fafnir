@@ -27,10 +27,10 @@ static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 static const struct pwm_dt_spec pwm_servo = PWM_DT_SPEC_GET(DT_NODELABEL(servo));
 #define SERVO_PERIOD PWM_MSEC(20)
 
-
-
-
-
+static const struct gpio_dt_spec pyro0_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro0_sense), gpios);
+static const struct gpio_dt_spec pyro1_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro1_sense), gpios);
+static const struct gpio_dt_spec pyro2_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro2_sense), gpios);
+const struct gpio_dt_spec pyroSensePins[NUM_PYROS] = {pyro0_sense, pyro1_sense, pyro2_sense};
 
 
 typedef enum {
@@ -185,15 +185,15 @@ typedef struct {
 
 // }
 
-// uint8_t pyroDetect(uint8_t index) {
-// 	if (index >= NUM_PYROS) return 69; //69 means error
-//     //LOW = continuity detected (return 0)
-//     //HIGH = open circuit (return 1)
+uint8_t pyroSense(uint8_t index) {
+	if (index >= NUM_PYROS) return 69; //69 means error
+    //HIGH = continuity detected (return 1)
+    //LOW = open circuit (return 0)
 
-// 	GPIO_PinState state = HAL_GPIO_ReadPin(pyroDetectPort, pyroDetectPins[index]);
+	int state = gpio_pin_get_dt(&pyroSensePins[index]);
 
-//     return (state == GPIO_PIN_RESET) ? 0 : 1;
-// }
+    return state;
+}
 
 void servoZero(void) {
 	servoRotate(0.0f);
@@ -243,6 +243,13 @@ int main(void)
 		return 0;
 	}
 
+	ret = gpio_pin_configure_dt(&pyro0_sense, GPIO_INPUT);
+	if (ret != 0) {
+		printk("Error %d: failed to configure %s pin %d\n",
+		       ret, pyro0_sense.port->name, pyro0_sense.pin);
+		return 0;
+	}
+
 	// ret = pwm_set_dt(&pwm_motor, 20000000, 500000); // 0 motor
 	// ret = pwm_set_dt(&pwm_servo, 20000000, 2500000); // move it a bit
 	// if (ret) {
@@ -253,14 +260,14 @@ int main(void)
 	servoRotate(90);
 
 	while (1) {
-		ret = gpio_pin_toggle_dt(&led);
+		// ret = gpio_pin_toggle_dt(&led);
+		ret = gpio_pin_set_dt(&led, pyroSense(0));
 		if (ret < 0) {
 			return 0;
 		}
 
-		led_state = !led_state;
 		printf("LED state: %s\n", led_state ? "ON" : "OFF");
-		k_msleep(SLEEP_TIME_MS);
+		k_msleep(10);
 	}
 	return 0;
 }

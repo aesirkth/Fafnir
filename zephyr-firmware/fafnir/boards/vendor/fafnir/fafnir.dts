@@ -49,17 +49,17 @@
         compatible = "gpio-keys";
         
         pyro0_sense: pyro_0_sense {
-			gpios = <&gpiob 15 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpiob 15 GPIO_ACTIVE_LOW>;
 			label = "Pyro Sense 0";
 		};
 
 		  pyro1_sense: pyro_1_sense {
-			gpios = <&gpioa 14 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpioa 14 GPIO_ACTIVE_LOW>;
 			label = "Pyro Sense 1";
 		};
 
 		  pyro2_sense: pyro_2_sense {
-			gpios = <&gpiob 13 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpiob 13 GPIO_ACTIVE_LOW>;
 			label = "Pyro Sense 2";
 		};
 	};
