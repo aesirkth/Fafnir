@@ -252,7 +252,7 @@ int main(void)
 
 	while (1) {
 		// ret = gpio_pin_toggle_dt(&led);
-		senseState = pyroSense(0);
+		uint8_t senseState = pyroSense(0);
 
 		if (senseState == 69) {
 			printk("pyro0_sense failed");
