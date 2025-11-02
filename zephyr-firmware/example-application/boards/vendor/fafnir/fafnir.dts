@@ -37,7 +37,7 @@
 };
 
 &timers3 {
-	st,prescaler = <90>;
+    st,prescaler = <900>;
 	status = "okay";
 
 	pwm3: pwm {

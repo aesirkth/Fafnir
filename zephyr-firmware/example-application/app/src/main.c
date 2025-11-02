@@ -40,12 +40,17 @@ int main(void)
 	}
 
 	if (!pwm_is_ready_dt(&pwm_motor)) {
+		gpio_pin_set_dt(&led, 1);
 		printk("Error: PWM device %s is not ready\n",
 		       pwm_motor.dev->name);
 		return 0;
 	}
 
-	ret = pwm_set_dt(&pwm_motor, 600000000, 1000000);
+	// ret = pwm_set_dt(&pwm_motor, 20000000, 500000); // 0 motor
+	ret = pwm_set_dt(&pwm_motor, 20000000, 2500000); // move it a bit
+	if (ret) {
+		return 0;
+	}
 
 	while (1) {
 		ret = gpio_pin_toggle_dt(&led);
