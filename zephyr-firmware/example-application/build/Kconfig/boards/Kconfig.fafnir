@@ -1,0 +1,2 @@
+# Load board Kconfig descriptions.
+osource "C:/Users/alexm/Fafnir/zephyr-firmware/example-application/boards/vendor/fafnir/Kconfig.fafnir"

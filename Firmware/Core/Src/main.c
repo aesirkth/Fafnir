@@ -674,7 +674,7 @@ void servoRotate(float angle) {
 	//The angle is mapped to -135 to 135 to properly represent CW and CCW rotations
 	//Input of +90 == 90 deg rotation CW from the zero position.
 
-	if (angle < -135 || angle > 135) angle = 0.0f;
+	if (angle < -135 || angle > 135) return;
 	angle = 135.0f + angle; //135 degrees is the zero/middle position, since the servo motor can rotate 270 deg
 
 	float degRatio = angle / 270.0f;
