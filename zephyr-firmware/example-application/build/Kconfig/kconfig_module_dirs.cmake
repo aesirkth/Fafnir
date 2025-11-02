@@ -1,6 +1,0 @@
-set(kconfig_env_dirs)
-list(APPEND kconfig_env_dirs ZEPHYR_EXAMPLE_APPLICATION_MODULE_DIR=C:/Users/alexm/Fafnir/zephyr-firmware/example-application)
-list(APPEND kconfig_env_dirs ZEPHYR_CMSIS_MODULE_DIR=C:/Users/alexm/Fafnir/zephyr-firmware/modules/hal/cmsis)
-list(APPEND kconfig_env_dirs ZEPHYR_CMSIS_6_MODULE_DIR=C:/Users/alexm/Fafnir/zephyr-firmware/modules/hal/cmsis_6)
-list(APPEND kconfig_env_dirs ZEPHYR_HAL_ST_MODULE_DIR=C:/Users/alexm/Fafnir/zephyr-firmware/modules/hal/st)
-list(APPEND kconfig_env_dirs ZEPHYR_HAL_STM32_MODULE_DIR=C:/Users/alexm/Fafnir/zephyr-firmware/modules/hal/stm32)

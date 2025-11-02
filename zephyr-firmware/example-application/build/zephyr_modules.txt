@@ -1,5 +1,0 @@
-"example-application":"C:/Users/alexm/Fafnir/zephyr-firmware/example-application":"C:/Users/alexm/Fafnir/zephyr-firmware/example-application"
-"cmsis":"C:/Users/alexm/Fafnir/zephyr-firmware/modules/hal/cmsis":"${ZEPHYR_CMSIS_CMAKE_DIR}"
-"cmsis_6":"C:/Users/alexm/Fafnir/zephyr-firmware/modules/hal/cmsis_6":"${ZEPHYR_CMSIS_6_CMAKE_DIR}"
-"hal_st":"C:/Users/alexm/Fafnir/zephyr-firmware/modules/hal/st":"C:/Users/alexm/Fafnir/zephyr-firmware/modules/hal/st"
-"hal_stm32":"C:/Users/alexm/Fafnir/zephyr-firmware/modules/hal/stm32":"C:/Users/alexm/Fafnir/zephyr-firmware/modules/hal/stm32"

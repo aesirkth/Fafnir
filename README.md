@@ -11,7 +11,7 @@ Follow [zephyr getting started guide](https://docs.zephyrproject.org/latest/deve
 ```bash
 cd zephyr-firmware
 west update
-cd example-application
+cd fafnir
 west build -b fafnir app --pristine
 west flash
 ```

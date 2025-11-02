@@ -1,2 +1,0 @@
-# Load Zephyr board defconfig descriptions.
-osource "C:/Users/alexm/Fafnir/zephyr-firmware/example-application/boards/vendor/fafnir/Kconfig.defconfig"
