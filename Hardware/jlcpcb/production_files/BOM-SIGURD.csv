@@ -1,0 +1,132 @@
+Comment,Designator,Footprint,LCSC,Quantity
+VN7050ASTR,U10,SOIC-8_3.9x4.9mm_P1.27mm,,1
+VN7050ASTR,U8,SOIC_050ASTR_STM,,1
+2.0 A,F7,Fuse_1812_4532Metric,,1
+28V,D12,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+3V,D9,D_SOD-323_HandSoldering,,1
+15k,R42,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+VN7050ASTR,U14,SOIC-8_3.9x4.9mm_P1.27mm,,1
+VN7050ASTR,U13,SOIC-8_3.9x4.9mm_P1.27mm,,1
+VN7050ASTR,U12,SOIC-8_3.9x4.9mm_P1.27mm,,1
+VN7050ASTR,U11,SOIC-8_3.9x4.9mm_P1.27mm,,1
+15k,R58,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+1k,R57,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R56,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R55,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+15k,R54,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+1k,R53,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R52,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R51,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+15k,R50,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+1k,R49,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R48,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R47,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+15k,R46,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+1k,R45,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R44,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R43,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+1k,R39,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R34,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R29,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+Solenoid 5,J13,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",,1
+Solenoid 4,J12,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",,1
+2.0 A,F11,Fuse_1812_4532Metric,,1
+2.0 A,F10,Fuse_1812_4532Metric,,1
+2.0 A,F9,Fuse_1812_4532Metric,,1
+2.0 A,F8,Fuse_1812_4532Metric,,1
+28V,D23,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+3V,D22,D_SOD-323_HandSoldering,,1
+28V,D21,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+3V,D20,D_SOD-323_HandSoldering,,1
+28V,D19,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+3V,D18,D_SOD-323_HandSoldering,,1
+28V,D17,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+3V,D15,D_SOD-323_HandSoldering,,1
+CMT-8504-100,BZ1,MagneticBuzzer_CUI_CMT-8504-100-SMT,,1
+INPUT,J1,JST_VH_B2P-VH-FB-B_1x02_P3.96mm_Vertical,,1
+18p,C10,C_0402_1005Metric,,1
+CAN input,J2,JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,,1
+ESD2CAN36DBZRQ1,CR1,SOT-23-3_DBZ_TEX,,1
+15k,R26,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+4u7,C11,C_0402_1005Metric,,1
+STM32U575CGTx,U2,LQFP-48_7x7mm_P0.5mm,,1
+LED_ARBG,D5,LED_Lumex_SML-LX0404SIUPGUSB,,1
+56,R41,R_0603_1608Metric,,1
+Solenoid 3,J11,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",,1
+Fuse,F3,Fuse_1206_3216Metric,,1
+0.1u,C19,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,,1
+SolderJumper_2_Open,JP1,SolderJumper-2_P1.3mm_Open_TrianglePad1.0x1.5mm,,1
+~,R4,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+Solenoid 2,J10,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",,1
+MountingHole_Pad,H2,MountingHole_3.2mm_M3_Pad_Via,,1
+MountingHole_Pad,H3,MountingHole_3.2mm_M3_Pad_Via,,1
+VN7050ASTR,U7,SOIC_050ASTR_STM,,1
+D,D2,D_SOD-523,,1
+1k,R28,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+120,R10,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+rx,D4,LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+1u,C14,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,,1
+28V,D10,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+100n,C7,C_0402_1005Metric,,1
+28V,D1,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+2.0 A,F5,Fuse_1812_4532Metric,,1
+3V,D8,D_SOD-323_HandSoldering,,1
+jst_sh 4,J4,JST_SH_SM06B-SRSS-TB_1x06-1MP_P1.00mm_Horizontal,,1
+Conn_01x04,J5,"PhoenixContact_GMSTBA_2,5_4-G_1x04_P7.50mm_Horizontal",,1
+28V,D13,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+0.1u,C8,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,,1
+1M,R14,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+22u,C21,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,,1
+Solenoid 1,J9,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",,1
+22,R40,R_0603_1608Metric,,1
+15A,F1,Fuse_1206_3216Metric,,1
+18p,C9,C_0402_1005Metric,,1
+4.7uH,L1,L_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+10u,C13,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,,1
+100n,C4,C_0402_1005Metric,,1
+47k,R27,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+470,R2,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+10k,R3,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+2.0 A,F6,Fuse_1812_4532Metric,,1
+tx,D3,LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+47k,R25,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+CAN out (optional),J3,JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,,1
+15k,R31,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+MountingHole_Pad,H1,MountingHole_3.2mm_M3_Pad_Via,,1
+AP63203WU,U9,TSOT-23-6,,1
+0.1u,C15,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,,1
+LED,D7,LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+47k,R35,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+28V,D16,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+4u7,C2,C_0402_1005Metric,,1
+BLM18KG102SN1D,FB1,L_0603_1608Metric_Pad1.05x0.95mm_HandSolder,,1
+47k,R32,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+VN7050ASTR,U6,SOIC_050ASTR_STM,,1
+100n,C6,C_0402_1005Metric,,1
+SZNUP2105L,D6,SOT-23,,1
+1M,R15,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+10k,R11,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+1k,R33,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+3V,D11,D_SOD-323_HandSoldering,,1
+15k,R36,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+1M,R13,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+56,R1,LED_0603_1608Metric,,1
+4u7,C1,C_0402_1005Metric,,1
+3V,D14,D_SOD-323_HandSoldering,,1
+100n,C3,C_0402_1005Metric,,1
+48MHz,Y1,Crystal_SMD_2016-4Pin_2.0x1.6mm,,1
+10k,R9,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R30,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+47k,R37,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+MountingHole_Pad,H4,MountingHole_3.2mm_M3_Pad_Via,,1
+TCAN334GDCN,U1,TSOT-23-8,,1
+2.0 A,F4,Fuse_1812_4532Metric,,1
+~,R5,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+1u,C12,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,,1
+1k,R22,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+22u,C16,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,,1
+1M,R12,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+ESD2CAN36DBZRQ1,CR2,SOT-23-3_DBZ_TEX,,1
+1k,R38,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,,1
+MMBT3904,Q1,SOT-23,,1
+100n,C5,C_0402_1005Metric,,1

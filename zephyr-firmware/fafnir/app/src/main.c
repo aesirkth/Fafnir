@@ -1,25 +1,18 @@
-/*
- * Copyright (c) 2016 Intel Corporation
- *
- * SPDX-License-Identifier: Apache-2.0
- */
-
 #include <stdio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/drivers/pwm.h>
 #include "main.h"
 
 
+LOG_MODULE_REGISTER(fafnir, LOG_LEVEL_INF);
+
+
 /* 1000 msec = 1 sec */
-#define SLEEP_TIME_MS   4000
-
-
-/*
- * A build error on this line means your board is unsupported.
- * See the sample documentation for information on how to fix this.
- */
-
+#define SLEEP_TIME_MS   5000
+#define NUM_PYROS 3
+#define IGNITION_CHANNEL 0
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_NODELABEL(led0), gpios);
 
@@ -34,16 +27,21 @@ static const struct gpio_dt_spec pyro0 = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro0), g
 static const struct gpio_dt_spec pyro1 = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro1), gpios);
 static const struct gpio_dt_spec pyro2 = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro2), gpios);
 
+
+//uint16_t targetAngle = 0;
+
 const struct gpio_dt_spec pyroSensePins[NUM_PYROS] = {pyro0_sense, pyro1_sense, pyro2_sense};
 const struct gpio_dt_spec pyroPins[NUM_PYROS] = {pyro0, pyro1, pyro2};
 
 
 typedef enum {
-    STATE_IDLE,
-    STATE_INIT,
-    STATE_READY,
-    STATE_ACTUATE
-} State;
+    SYS_IDLE,
+    SYS_INIT,
+    SYS_READY,
+    SYS_ACTUATE,
+    SYS_DEACTUATE
+} fafnir_state;
+
 
 typedef enum {
     CMD_NONE,
@@ -51,217 +49,230 @@ typedef enum {
     CMD_SERVO_ROTATE,
     CMD_PYRO_ACTUATE,
     CMD_PYRO_DISABLE
-} CommandType;
+} fafnir_commands;
 
-typedef struct {
-    CommandType type;
-    uint8_t pyroIndex;
-    uint16_t angle;
-} Command;
+typedef enum {
+    SERVO_IDLE,
+    SERVO_ZERO,
+    SERVO_ROTATE
+} servo_state;
 
-State servoState = STATE_IDLE;
-State pyroState[NUM_PYROS] = {STATE_IDLE, STATE_IDLE, STATE_IDLE};
-uint8_t pyroMask = 0b000;
-uint16_t targetAngle = 0;
+typedef enum {
+    PYRO_OFF,
+    PYRO_SENSE,
+    PYRO_READY,
+    PYRO_ON
+} pyro_state;
+
+fafnir_state systemState = SYS_IDLE;
+servo_state servoState = SERVO_IDLE;
+pyro_state pyroState[NUM_PYROS] = { PYRO_OFF, PYRO_OFF, PYRO_OFF };
 
 
-void processCommand(Command cmd) {
-
-	if (systemIdle()) return;
-
-
-    switch (cmd.type) {
-        case CMD_SERVO_ZERO:
-            servoState = STATE_INIT;
-            break;
-
-        case CMD_SERVO_ROTATE:
-            targetAngle = cmd.angle;
-            if (servoState == STATE_READY) servoState = STATE_ACTUATE;
-            break;
-
-        case CMD_PYRO_ACTUATE:
-            if (cmd.pyroIndex < NUM_PYROS && pyroState[cmd.pyroIndex] == STATE_READY)
-                pyroState[cmd.pyroIndex] = STATE_ACTUATE;
-            break;
-
-        case CMD_PYRO_DISABLE:
-            if (cmd.pyroIndex < NUM_PYROS)
-                pyroState[cmd.pyroIndex] = STATE_INIT;
-            break;
-
-        default:
-            break;
+int main(void)
+{
+    if (!initializePins()) {
+        LOG_ERR("Pin initialization failed");
+        return 0;
     }
+
+  
+    servoZero();
+
+    LOG_INF("System booted, in IDLE");
+
+    while (1) {
+        switch (systemState) {
+            case SYS_IDLE:
+                // Wait for a CAN command to start INIT
+                break;
+
+
+            case SYS_INIT: {
+                static bool init_started = false;
+
+                if (!init_started) {
+                    for (int i = 0; i < NUM_PYROS; i++)
+                        pyroState[i] = PYRO_SENSE;
+                    servoState = SERVO_ZERO;
+                    init_started = true;
+                }
+
+                if (systemReady()) {
+                    k_msleep(250);
+                    systemState = SYS_READY;
+                    LOG_INF("SYSTEM READY");
+                    init_started = false;
+                }
+                break;
+            }
+
+            case SYS_READY:
+                // Waiting for ACTUATE command
+                break;
+
+            case SYS_ACTUATE:
+                LOG_INF("SYSTEM ACTUATING");
+                pyroActuate(IGNITION_CHANNEL, 1);
+                k_msleep(150);
+                servoRotate(90);
+                k_msleep(5000);
+                systemState = SYS_DEACTUATE;
+                break;
+
+            case SYS_DEACTUATE:
+                LOG_INF("SYSTEM DEACTUATING");
+                pyroActuate(IGNITION_CHANNEL, 0);
+                servoRotate(0);
+                for (int i = 0; i < NUM_PYROS; i++)
+                    pyroActuate(i, 0);
+                systemState = SYS_READY;
+                break;
+
+            default:
+                systemState = SYS_IDLE;
+                break;
+        }
+
+            handleServo();
+            for (int i = 0; i < NUM_PYROS; i++)
+                handlePyro(i);
+
+            static bool led_on = false;
+            gpio_pin_set_dt(&led, led_on);
+            led_on = !led_on;
+
+            k_msleep(50);
+        }
+
 }
 
-uint8_t systemReady(void) {
-    if (servoState != STATE_READY)
+int initializePins() {
+
+    int ret;
+
+    if (!gpio_is_ready_dt(&led))
+        return 0;
+    ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
+    if (ret < 0)
         return 0;
 
+    if (!pwm_is_ready_dt(&pwm_servo)) {
+        LOG_ERR("PWM NOT READY");
+        return 0;
+    }
+
+    ret = gpio_pin_configure_dt(&pyro0_sense, GPIO_INPUT);
+    if (ret != 0) {
+        LOG_ERR("PYRO 0 SENSE NOT READY");
+        return 0;
+    }
+
     for (int i = 0; i < NUM_PYROS; i++) {
-        if (pyroState[i] != STATE_READY)
+        ret = gpio_pin_configure_dt(&pyroPins[i], GPIO_OUTPUT_INACTIVE);
+        if (ret < 0) {
+            LOG_ERR("FAILED TO CONFIGURE PYRO PINS");
             return 0;
+        }
     }
 
     return 1;
-} //essentially just check that everything is in the READY state for the first time, send the ready status to CAN to Fjalar
 
-uint8_t systemIdle(void) {
-	  if (servoState == STATE_IDLE) return 1;
-
-	    for (int i = 0; i < NUM_PYROS; i++) {
-	        if (pyroState[i] == STATE_IDLE)
-	            return 1;
-	    }
-
-	    return 0;
 }
+
+bool systemReady(void) {
+    //Servo must have completed its zeroing
+    if (servoState != SERVO_IDLE && servoState != SERVO_ZERO) {
+        return false;
+    }
+
+    // All pyro channels must be ready (continuity detected)
+    for (int i = 0; i < NUM_PYROS; i++) {
+        if (pyroState[i] != PYRO_READY) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 
 void handleServo(void) {
     switch (servoState) {
-        case STATE_IDLE:
-            //Do nothing until we receive some initial command
-            break;
+    case SERVO_ZERO:
+        servoZero();
+        servoState = SERVO_IDLE;
+        break;
 
-        case STATE_INIT:
-            servoZero();
-            servoState = STATE_READY;
-            break;
+    case SERVO_ROTATE:
+        servoRotate(90);
+        servoState = SERVO_IDLE;
+        break;
 
-        case STATE_READY:
-            //Wait for rotation command
-            break;
-
-        case STATE_ACTUATE:
-            servoRotate(targetAngle);
-            servoState = STATE_READY;
-            break;
+    default:
+        break;
     }
 }
 
 void handlePyro(int i) {
     switch (pyroState[i]) {
-        case STATE_IDLE:
-            //Do nothing until we receive some initial command
-            break;
+    case PYRO_OFF:
+        pyroActuate(i, 0);
+        break;
 
-        case STATE_INIT:
-            pyroActuate(i, 0);
-            if (pyroSense(i) == 0) { //Low = continuity detected
-                pyroState[i] = STATE_READY;
-            }
-            break;
+    case PYRO_SENSE:
+        if (pyroSense(i) == 0) {
+            pyroState[i] = PYRO_READY;
+            LOGG_INF("PYRO CONTINUITY OK")
+        }
+        break;
 
-        case STATE_READY:
-            // WAit for actuation command
-            break;
+    case PYRO_READY:
+        break;
 
-        case STATE_ACTUATE:
-            pyroActuate(i, 1);
-            //remain active until the CMD_PYRO_DISABLE is received
-            break;
+    case PYRO_ON:
+        pyroActuate(i, 1);
+        k_msleep(100);
+        pyroActuate(i, 0);
+        pyroState[i] = PYRO_READY;
+        break;
+
+    default:
+        break;
     }
 }
 
-void forceInit(void) {
-	//USED ONLY FOR DEBUGGING
-	servoState = STATE_INIT;
-	handleServo();
-	for (int i = 0; i < NUM_PYROS; i++) { 
-	    pyroState[i] = STATE_INIT;
-		handlePyro(i);
-
-	}
-
-}
 
 void pyroActuate(uint8_t index, uint8_t state) {
-	if (index >= NUM_PYROS) return;
-	if (state != 1 && state != 0) return;
-	gpio_pin_set_dt(&pyroPins[index], state);
-	
-    if (state) {
-    	pyroMask |=  (1 << index); //set union
-    } else {
-    	pyroMask &= ~(1 << index); //set intersection
-    }
+    if (index >= NUM_PYROS) return;
+    if (state != 1 && state != 0) return;
+    gpio_pin_set_dt(&pyroPins[index], state);
 }
 
 uint8_t pyroSense(uint8_t index) {
-	if (index >= NUM_PYROS) return 69; //69 means error
+    if (index >= NUM_PYROS) return 69; //69 means error
     //HIGH = continuity detected (return 1)
     //LOW = open circuit (return 0)
 
-	int state = gpio_pin_get_dt(&pyroSensePins[index]);
+    int state = gpio_pin_get_dt(&pyroSensePins[index]);
 
     return state;
 }
 
 void servoZero(void) {
-	servoRotate(0.0f);
+    servoRotate(0.0f);
 }
 
 void servoRotate(float angle) {
-	//The angle is mapped to -135 to 135 to properly represent CW and CCW rotations
-	//Input of +90 == 90 deg rotation CW from the zero position.
+    //The angle is mapped to -135 to 135 to properly represent CW and CCW rotations
+    //Input of +90 == 90 deg rotation CW from the zero position.
 
-	if (angle < -135 || angle > 135) return;
-	angle = 135.0f + angle; //135 degrees is the zero/middle position, since the servo motor can rotate 270 deg
+    if (angle < -135 || angle > 135) return;
+    angle = 135.0f + angle; //135 degrees is the zero/middle position, since the servo motor can rotate 270 deg
 
-	float degRatio = angle / 270.0f;
+    float degRatio = angle / 270.0f;
 
-	float duty = degRatio * 0.10f + 0.025f;  //mapping to 2.5%–12.5% duty cycle
-	pwm_set_dt(&pwm_servo, SERVO_PERIOD, (uint32_t) SERVO_PERIOD*duty); // move it a bit
+    float duty = degRatio * 0.10f + 0.025f;  //mapping to 2.5%–12.5% duty cycle
+    pwm_set_dt(&pwm_servo, SERVO_PERIOD, (uint32_t)SERVO_PERIOD * duty);
 
-}
-
-
-
-
-int main(void)
-{
-	int ret;
-	bool led_state = true;
-
-	if (!gpio_is_ready_dt(&led)) {
-		return 0;
-	}
-
-	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
-	if (ret < 0) {
-		return 0;
-	}
-
-	if (!pwm_is_ready_dt(&pwm_servo)) {
-		printk("Error: PWM device %s is not ready\n",
-		       pwm_servo.dev->name);
-		return 0;
-	}
-
-	ret = gpio_pin_configure_dt(&pyro0_sense, GPIO_INPUT);
-	if (ret != 0) {
-		printk("Error %d: failed to configure %s pin %d\n",
-		       ret, pyro0_sense.port->name, pyro0_sense.pin);
-		return 0;
-	}
-
-	servoZero();
-	k_msleep(SLEEP_TIME_MS);
-	servoRotate(90);
-
-	while (1) {
-		// ret = gpio_pin_toggle_dt(&led);
-		uint8_t senseState = pyroSense(0);
-
-		if (senseState == 69) {
-			printk("pyro0_sense failed");
-			return 0;
-		}
-
-		gpio_pin_set_dt(&led, senseState);
-
-		k_msleep(50);
-	}
-	return 0;
 }

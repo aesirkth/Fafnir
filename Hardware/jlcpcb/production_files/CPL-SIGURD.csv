@@ -1,0 +1,127 @@
+Designator,Val,Package,Mid X,Mid Y,Rotation,Layer
+BZ1,CMT-8504-100,MagneticBuzzer_CUI_CMT-8504-100-SMT,79.85,-125.15,180.0,top
+C1,4u7,C_0402_1005Metric,115.0,-92.2,0.0,top
+C10,18p,C_0402_1005Metric,108.149999,-88.53,90.0,top
+C11,4u7,C_0402_1005Metric,102.58,-98.31,90.0,top
+C12,1u,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,93.99,-82.75,0.0,top
+C13,10u,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,91.5,-85.25,90.0,top
+C14,1u,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,89.9,-85.25,90.0,top
+C15,0.1u,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,88.35,-85.2,90.0,top
+C16,22u,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,81.925,-87.85,0.0,top
+C19,0.1u,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,82.6,-85.25,-90.0,top
+C2,4u7,C_0402_1005Metric,111.325,-101.65,180.0,top
+C21,22u,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,85.3,-87.85,180.0,top
+C3,100n,C_0402_1005Metric,112.82,-91.26,0.0,top
+C4,100n,C_0402_1005Metric,111.325,-102.68,180.0,top
+C5,100n,C_0402_1005Metric,103.51,-99.76,180.0,top
+C6,100n,C_0402_1005Metric,107.49,-90.11,0.0,top
+C7,100n,C_0402_1005Metric,114.98,-93.2,0.0,top
+C8,0.1u,C_0603_1608Metric_Pad1.08x0.95mm_HandSolder,124.79,-94.5,-90.0,top
+C9,18p,C_0402_1005Metric,112.109999,-88.53,-90.0,top
+CR1,ESD2CAN36DBZRQ1,SOT-23-3_DBZ_TEX,128.634,-89.220001,90.0,top
+CR2,ESD2CAN36DBZRQ1,SOT-23-3_DBZ_TEX,128.634,-99.970001,90.0,top
+D1,28V,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,98.05,-79.05,90.0,top
+D10,28V,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,121.235,-119.235,-90.0,top
+D11,3V,D_SOD-323_HandSoldering,104.980483,-115.3,90.0,top
+D12,28V,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,152.65,-129.395,0.0,top
+D13,28V,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,106.720483,-119.2,-90.0,top
+D14,3V,D_SOD-323_HandSoldering,89.61,-115.05,90.0,top
+D15,3V,D_SOD-323_HandSoldering,239.805,-87.98,0.0,top
+D16,28V,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,91.16,-119.0,-90.0,top
+D17,28V,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,244.545,-87.8,0.0,top
+D18,3V,D_SOD-323_HandSoldering,255.635,-87.98,0.0,top
+D19,28V,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,260.375,-87.8,0.0,top
+D2,D,D_SOD-523,85.81,-125.1575,90.0,top
+D20,3V,D_SOD-323_HandSoldering,255.635,-104.46,0.0,top
+D21,28V,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,260.375,-104.28,0.0,top
+D22,3V,D_SOD-323_HandSoldering,230.37,-104.4,0.0,top
+D23,28V,D_0603_1608Metric_Pad1.05x0.95mm_HandSolder,244.545,-104.28,0.0,top
+D3,tx,LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder,118.864517,-102.370001,180.0,top
+D4,rx,LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder,118.872982,-100.72,180.0,top
+D5,LED_ARBG,LED_Lumex_SML-LX0404SIUPGUSB,100.665,-91.165,0.0,top
+D6,SZNUP2105L,SOT-23,121.0625,-94.48,180.0,top
+D7,LED,LED_0603_1608Metric_Pad1.05x0.95mm_HandSolder,96.225,-88.505,-90.0,top
+D8,3V,D_SOD-323_HandSoldering,119.55,-115.31,90.0,top
+D9,3V,D_SOD-323_HandSoldering,147.91,-129.575,0.0,top
+F1,15A,Fuse_1206_3216Metric,94.51,-74.5,-90.0,top
+F10,2.0 A,Fuse_1812_4532Metric,256.54,-100.51,0.0,top
+F11,2.0 A,Fuse_1812_4532Metric,240.71,-100.51,0.0,top
+F3,Fuse,Fuse_1206_3216Metric,94.51,-79.54,-90.0,top
+F4,2.0 A,Fuse_1812_4532Metric,125.72,-117.9725,90.0,top
+F5,2.0 A,Fuse_1812_4532Metric,111.230483,-117.9375,90.0,top
+F6,2.0 A,Fuse_1812_4532Metric,95.66,-117.7375,90.0,top
+F7,2.0 A,Fuse_1812_4532Metric,148.815,-125.625,0.0,top
+F8,2.0 A,Fuse_1812_4532Metric,240.71,-84.03,0.0,top
+F9,2.0 A,Fuse_1812_4532Metric,256.54,-84.03,0.0,top
+FB1,BLM18KG102SN1D,L_0603_1608Metric_Pad1.05x0.95mm_HandSolder,94.0,-84.33,0.0,top
+J1,INPUT,JST_VH_B2P-VH-FB-B_1x02_P3.96mm_Vertical,87.385,-74.6625,0.0,top
+J10,Solenoid 2,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",108.82,-128.77,0.0,top
+J11,Solenoid 3,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",93.304517,-128.77,0.0,top
+J12,Solenoid 4,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",217.74,-81.21,0.0,top
+J13,Solenoid 5,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",217.74,-93.335,0.0,top
+J2,CAN input,JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,134.665,-89.38,-90.0,top
+J3,CAN out (optional),JST_XH_B2B-XH-A_1x02_P2.50mm_Vertical,134.665,-100.0325,-90.0,top
+J4,jst_sh 4,JST_SH_SM06B-SRSS-TB_1x06-1MP_P1.00mm_Horizontal,134.06,-110.83,90.0,top
+J5,Conn_01x04,"PhoenixContact_GMSTBA_2,5_4-G_1x04_P7.50mm_Horizontal",114.54,-76.09,180.0,top
+J9,Solenoid 1,"TerminalBlock_Phoenix_MKDS-1,5-2-5.08_1x02_P5.08mm_Horizontal",123.429517,-128.77,0.0,top
+L1,4.7uH,L_0603_1608Metric_Pad1.05x0.95mm_HandSolder,80.925,-85.225,-90.0,top
+Q1,MMBT3904,SOT-23,83.35,-117.83,-90.0,top
+R1,56,LED_0603_1608Metric,103.29,-89.75,180.0,top
+R10,120,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,128.9656,-86.25,180.0,top
+R11,10k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,125.68,-99.25,90.0,top
+R12,1M,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,75.01,-80.53,90.0,top
+R13,1M,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,80.55,-135.0,180.0,top
+R14,1M,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,135.0,-81.03,90.0,top
+R15,1M,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,129.35,-135.0,0.0,top
+R2,470,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,83.35,-115.05,0.0,top
+R22,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,94.525,-88.505,-90.0,top
+R25,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,122.92,-119.1975,-90.0,top
+R26,15k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,128.71,-109.41,-90.0,top
+R27,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,119.55,-119.1975,90.0,top
+R28,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,121.46,-109.7,-90.0,top
+R29,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,143.165,-117.825,0.0,top
+R3,10k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,83.35,-113.48,180.0,top
+R30,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,108.420483,-119.1625,-90.0,top
+R31,15k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,114.280483,-109.9625,-90.0,top
+R32,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,104.955,-119.1625,90.0,top
+R33,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,106.760483,-109.590001,-90.0,top
+R34,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,143.165,-120.335,0.0,top
+R35,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,92.8,-118.9625,-90.0,top
+R36,15k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,99.084517,-109.545001,-90.0,top
+R37,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,89.56,-118.9625,90.0,top
+R38,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,91.26,-110.0,-90.0,top
+R39,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,143.165,-122.845,0.0,top
+R4,~,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,122.2825,-102.37,0.0,top
+R40,22,R_0603_1608Metric,101.305,-93.62,180.0,top
+R41,56,R_0603_1608Metric,103.3,-91.33,180.0,top
+R42,15k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,143.165,-125.355,0.0,top
+R43,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,235.06,-76.23,0.0,top
+R44,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,235.06,-78.74,0.0,top
+R45,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,235.06,-81.25,0.0,top
+R46,15k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,235.06,-83.76,0.0,top
+R47,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,250.89,-76.23,0.0,top
+R48,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,250.89,-78.74,0.0,top
+R49,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,250.89,-81.25,0.0,top
+R5,~,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,122.31,-100.68,0.0,top
+R50,15k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,250.89,-83.76,0.0,top
+R51,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,250.89,-92.71,0.0,top
+R52,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,250.89,-95.22,0.0,top
+R53,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,250.89,-97.73,0.0,top
+R54,15k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,250.89,-100.24,0.0,top
+R55,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,235.06,-92.71,0.0,top
+R56,47k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,235.06,-95.22,0.0,top
+R57,1k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,235.06,-97.73,0.0,top
+R58,15k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,235.06,-100.24,0.0,top
+R9,10k,R_0603_1608Metric_Pad0.98x0.95mm_HandSolder,132.445483,-105.069999,0.0,top
+U1,TCAN334GDCN,TSOT-23-8,127.82,-94.5575,0.0,top
+U10,VN7050ASTR,SOIC-8_3.9x4.9mm_P1.27mm,146.815,-113.43,-90.0,top
+U11,VN7050ASTR,SOIC-8_3.9x4.9mm_P1.27mm,241.46,-78.33,0.0,top
+U12,VN7050ASTR,SOIC-8_3.9x4.9mm_P1.27mm,257.29,-78.33,0.0,top
+U13,VN7050ASTR,SOIC-8_3.9x4.9mm_P1.27mm,257.29,-94.81,0.0,top
+U14,VN7050ASTR,SOIC-8_3.9x4.9mm_P1.27mm,241.46,-94.81,0.0,top
+U2,STM32U575CGTx,LQFP-48_7x7mm_P0.5mm,108.684517,-95.952501,-90.0,top
+U6,VN7050ASTR,SOIC_050ASTR_STM,125.079517,-110.119151,-90.0,top
+U7,VN7050ASTR,SOIC_050ASTR_STM,110.565,-110.285001,-90.0,top
+U8,VN7050ASTR,SOIC_050ASTR_STM,95.049517,-110.240001,-90.0,top
+U9,AP63203WU,TSOT-23-6,85.4625,-85.25,180.0,top
+Y1,48MHz,Crystal_SMD_2016-4Pin_2.0x1.6mm,110.13,-88.53,180.0,top
