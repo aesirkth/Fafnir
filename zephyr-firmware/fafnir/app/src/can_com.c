@@ -5,6 +5,8 @@
 
 LOG_MODULE_REGISTER(can_com);
 
+K_SEM_DEFINE(can_tx_done, 1, 1);
+
 const struct device *const can_dev = DEVICE_DT_GET(DT_NODELABEL(fdcan1));
 
 static const struct can_filter filter = {
@@ -15,7 +17,17 @@ static const struct can_filter filter = {
 
 static void can_rx_cb(const struct device *dev, struct can_frame *frame, void *user_data)
 {
+    LOG_DBG("rx: %#X", frame->id);
     memcpy(user_data, frame->data, frame->dlc);
+}
+
+void can_tx_cb(const struct device *device, int error, void *user_data) {
+    if (error) {
+        LOG_ERR("can send callback error %d", error);
+    } else {
+        LOG_INF("CAN TX OK");
+    }
+    k_sem_give(&can_tx_done);
 }
 
 void send_test_frame(void)
@@ -29,7 +41,7 @@ void send_test_frame(void)
     frame.data[0] = 0xAB;
     frame.data[1] = 0xCD;
 
-    int ret = can_send(can_dev, &frame, K_MSEC(10), NULL, NULL);
+    int ret = can_send(can_dev, &frame, K_MSEC(10), can_tx_cb, NULL);
     if (ret < 0) {
         LOG_ERR("CAN TX error %d", ret);
     }
@@ -49,9 +61,11 @@ int init_can(void *rx_buffer)
     }
 
     ret = can_set_bitrate(can_dev, 500000);
-    if (ret < 0) {
-        LOG_ERR("Bitrate error %d", ret);
+    if (ret) {
+        LOG_ERR("failed to set CAN nominal bitrate: [%d]", ret);
         return -1;
+    } else {
+        LOG_INF("CAN nominal bitrate successfully set to 500kb/s");
     }
 
     ret = can_start(can_dev);
