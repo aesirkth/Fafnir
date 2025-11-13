@@ -7,8 +7,7 @@ extern "C" {
 
 
 int init_can(void *can_user_data);
-
-// void submit_can_pkt(const void *packet, unsigned int type);
+void send_test_frame(void);
 
 
 #ifdef __cplusplus
