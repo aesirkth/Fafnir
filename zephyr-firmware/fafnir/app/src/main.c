@@ -4,6 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+#include "can_com.h"
+
 #include <stdio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
@@ -61,6 +63,8 @@ typedef struct {
 
 State servoState = STATE_IDLE;
 State pyroState[NUM_PYROS] = {STATE_IDLE, STATE_IDLE, STATE_IDLE};
+volatile Command lastReceivedCommand = {0}; // possibly make this an "Option"
+                                            // type to indicate if no command was received
 uint8_t pyroMask = 0b000;
 uint16_t targetAngle = 0;
 
@@ -250,6 +254,10 @@ int main(void)
 	k_msleep(SLEEP_TIME_MS);
 	servoRotate(90);
 
+    volatile uint8_t can_scratchpad[100];
+    can_scratchpad[0] = 1;
+    init_can((void *) can_scratchpad);
+
 	while (1) {
 		// ret = gpio_pin_toggle_dt(&led);
 		uint8_t senseState = pyroSense(0);
@@ -259,7 +267,7 @@ int main(void)
 			return 0;
 		}
 
-		gpio_pin_set_dt(&led, senseState);
+		gpio_pin_set_dt(&led, can_scratchpad[0]);
 
 		k_msleep(50);
 	}
