@@ -852,6 +852,36 @@
 			(embedded_fonts no)
 		)
 	)
+	(text "R+O BZT52C3V3S"
+		(exclude_from_sim no)
+		(at 108.458 80.772 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "069e2095-e195-48c9-861e-4e38b367b763")
+	)
+	(text "LUTE 1812L010/100GR"
+		(exclude_from_sim no)
+		(at 155.702 67.31 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "362391d2-7d95-40d9-932d-a4187b41db16")
+	)
+	(text "EATON 0603ESDA-MLP7"
+		(exclude_from_sim no)
+		(at 137.414 83.566 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+		(uuid "c97f629d-224a-4b74-9301-5259cb0def27")
+	)
 	(junction
 		(at 135.89 69.85)
 		(diameter 0)
@@ -1129,7 +1159,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 118.11 69.85 0)
 			(effects
 				(font
@@ -1209,7 +1239,7 @@
 				)
 			)
 		)
-		(property "Value" "2.0 A"
+		(property "Value" "1.0A"
 			(at 142.24 66.04 90)
 			(effects
 				(font
@@ -1308,16 +1338,17 @@
 				(justify right)
 			)
 		)
-		(property "Value" "28V"
+		(property "Value" "~"
 			(at 138.43 76.1999 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
+				(hide yes)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder"
+		(property "Footprint" "Diode_SMD:D_0603_1608Metric"
 			(at 135.89 74.93 0)
 			(effects
 				(font
@@ -1416,7 +1447,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SOD-323_HandSoldering"
+		(property "Footprint" "Diode_SMD:D_SOD-323"
 			(at 111.76 72.39 90)
 			(effects
 				(font
@@ -1515,7 +1546,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 125.73 62.23 0)
 			(effects
 				(font

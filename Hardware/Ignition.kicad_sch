@@ -1607,7 +1607,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0201_0603Metric"
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 215.9 76.2 0)
 			(effects
 				(font
@@ -1668,16 +1668,17 @@
 				(justify right)
 			)
 		)
-		(property "Value" "28V"
+		(property "Value" "~"
 			(at 135.89 82.5499 90)
 			(effects
 				(font
 					(size 1.27 1.27)
 				)
 				(justify right)
+				(hide yes)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_0603_1608Metric_Pad1.05x0.95mm_HandSolder"
+		(property "Footprint" "Diode_SMD:D_0603_1608Metric"
 			(at 133.35 81.28 0)
 			(effects
 				(font
@@ -1754,7 +1755,7 @@
 				)
 			)
 		)
-		(property "Value" "2.0 A"
+		(property "Value" "1.0A"
 			(at 139.7 72.39 90)
 			(effects
 				(font
@@ -1850,7 +1851,7 @@
 				(justify right)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0201_0603Metric"
+		(property "Footprint" "Resistor_SMD:R_0402_1005Metric"
 			(at 209.55 76.2 0)
 			(effects
 				(font
@@ -2075,7 +2076,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Diode_SMD:D_SOD-323_HandSoldering"
+		(property "Footprint" "Diode_SMD:D_SOD-323"
 			(at 109.22 78.74 90)
 			(effects
 				(font
@@ -2229,7 +2230,7 @@
 				(justify left)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 123.19 68.58 0)
 			(effects
 				(font
@@ -2372,7 +2373,7 @@
 				)
 			)
 		)
-		(property "Footprint" "Resistor_SMD:R_0603_1608Metric_Pad0.98x0.95mm_HandSolder"
+		(property "Footprint" "Resistor_SMD:R_0603_1608Metric"
 			(at 115.57 76.2 0)
 			(effects
 				(font

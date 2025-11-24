@@ -1,4 +1,18 @@
-25230110806286530
+25247746782415798
+1727023
+CONN_1727023_PXC
+
+1727023 
+0
+3
+3
+1935242
+CONN10_1935242_PXC
+
+1935242 
+0
+10
+10
 Audio_Module
 Reverb_BTDR-1H
 Digital Reverberation Unit, http://www.belton.co.kr/inc/downfile.php?seq=17&file=pdf (footprint from http://www.uk-electronic.de/PDF/BTDR-1.pdf)
@@ -58001,6 +58015,20 @@ IND-SMD_L7.0-W6.6_FAUL06XX
 0
 2
 2
+FEXL0660A-5R6M
+BUZ-SMD_4P-L7.5-W7.5-P7.59-TL
+
+
+0
+4
+4
+FEXL0660A-5R6M
+IND-SMD_L6.6-W6.4
+
+
+0
+2
+2
 Ferrite_THT
 LairdTech_28C0236-0JW-10
 Ferrite, vertical, LairdTech 28C0236-0JW-10, https://assets.lairdtech.com/home/brandworld/files/28C0236-0JW-10.pdf, JW Miller core https://www.bourns.com/products/magnetic-products/j.w.-miller-through-hole-ferrite-beads-emi-filters
@@ -66688,6 +66716,27 @@ Yellow 5381 Series LED
 0
 2
 2
+LM2940IMP-12/NOPB
+DCY0004A_L
+
+LM2940IMP-10/NOPB 
+0
+4
+4
+LM2940IMP-12/NOPB
+DCY0004A_M
+
+LM2940IMP-10/NOPB 
+0
+4
+4
+LM2940IMP-12/NOPB
+DCY0004A_N
+
+LM2940IMP-10/NOPB 
+0
+4
+4
 LM51231-Q1
 RGR0020C-IPC_A
 
@@ -66716,6 +66765,20 @@ LM51231QRGRRQ1
 0
 26
 26
+Library
+BUZ-SMD_4P-L7.5-W7.5-P7.59-TL
+
+
+0
+4
+4
+Library
+IND-SMD_L6.6-W6.4
+
+
+0
+2
+2
 Module
 A20_OLINUXINO_LIME2
 A20 Olinuxino LIME2, 1.2GHz, 512-1024MB RAM, Micro-SD, NAND or eMMC, 1000Mbit Ethernet
@@ -94527,6 +94590,13 @@ TPS4H160AQPWPRQ1
 0
 50
 30
+TPS4H160-Q1
+Untitled
+
+
+0
+0
+0
 TPS56A37RPAR
 RPA0010A-MFG
 
