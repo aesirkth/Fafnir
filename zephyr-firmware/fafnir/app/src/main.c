@@ -16,6 +16,9 @@
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS   4000
 
+K_TIMER_DEFINE(timer_1, timerCallback_1, NULL);
+K_TIMER_DEFINE(timer_2, timerCallback_2, NULL);
+
 LOG_MODULE_REGISTER(main_func);
 
 
@@ -58,7 +61,9 @@ typedef enum {
     STATE_STOP_FILL,
     STATE_UMBILICAL,
     STATE_N2_PRESSURIZATION,
-    STATE_IGNITION,
+    STATE_IGNITION_1,
+    STATE_IGNITION_2,
+    STATE_IGNITION_3,
     STATE_SAFE,
     STATE_ABORT,
 } State;
@@ -66,6 +71,15 @@ typedef enum {
 State fafnir_state = STATE_IDLE;
 bool trigger = false;
 
+void timerCallback_1() { 
+    fafnir_state = STATE_IGNITION_2;
+    trigger = true;
+}
+
+void timerCallback_2() { 
+    fafnir_state = STATE_IGNITION_3;
+    trigger = true;
+}
 
 
 void servoZero(void) {
@@ -113,17 +127,30 @@ void evaluateState() {
         //nothing :)
         break;
 
-        case N2_PRESSURIZATION:
+        case STATE_N2_PRESSURIZATION:
         gpio_pin_set_dt(&N2_valve, 1);
         break;
 
-        case IGNITION:
+        case STATE_IGNITION_1:
         //T-10 seconds
             //wait
-        //T-3 seconds
+        //buzzer and LED
+        k_timer_start(&timer_1, K_MSEC(70000), K_NO_WAIT);
+
+        break;
+
+        case STATE_IGNITION_2: 
+            //T-3 seconds
             //servoRotate(10);
-            //Open main valve 
-            //wait...
+            //delay(50ms)
+            k_timer_start(&timer_2, K_MSEC(3000), K_NO_WAIT);
+            //wait
+        break;
+
+        case STATE_IGNITION_3;
+            
+        break;
+ 
         //T-0 Seconds
         //servoRotate(90);
         break;
@@ -191,6 +218,12 @@ int main(void)
     resetState();
 
 	while (1) {
+
+        if(trigger) { 
+            evaluateState();
+        }
+        
+        trigger=false;
 
         
 	}
