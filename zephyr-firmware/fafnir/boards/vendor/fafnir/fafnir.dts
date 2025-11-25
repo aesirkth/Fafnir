@@ -12,9 +12,9 @@
 		zephyr,canbus = &fdcan1;
 	};
 
-    // aliases {
-	// 	led0 = &led0;
-	// };
+    aliases {
+		fdcan1 = &fdcan1;
+	};
 
     leds {
         compatible = "gpio-leds";

@@ -1,0 +1,19 @@
+{
+    "files.associations": {
+        ".als.json": "jsonc",
+        "flake.lock": "json",
+        "*.y": "yacc",
+        "main.h": "c",
+        "stdio.h": "c",
+        "ratio": "c",
+        "system_error": "c",
+        "array": "c",
+        "functional": "c",
+        "regex": "c",
+        "tuple": "c",
+        "type_traits": "c",
+        "utility": "c",
+        "gpio_emul.h": "c",
+        "gpio_utils.h": "c"
+    }
+}

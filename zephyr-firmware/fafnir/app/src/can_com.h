@@ -5,10 +5,11 @@
 extern "C" {
 #endif
 
+#include <stddef.h>
 
 int init_can(void *can_user_data);
 
-// void submit_can_pkt(const void *packet, unsigned int type);
+void submit_can_pkt(const void *packet, size_t length);
 
 
 #ifdef __cplusplus

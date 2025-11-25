@@ -1,0 +1,55 @@
+
+/ {
+	aliases {
+		fdcan1 = &can_loopback0;
+	};
+
+    leds {
+        compatible = "gpio-leds";
+        
+        led0: led_0 {
+			gpios = <&gpio0 6 GPIO_ACTIVE_HIGH>;
+			label = "Green LED 0";
+		};
+    };
+
+	pyro {
+        compatible = "gpio-leds";
+        
+        pyro0: pyro_0 {
+			gpios = <&gpio0 8 GPIO_ACTIVE_HIGH>;
+			label = "Pyro Actuate 0";
+		};
+
+		  pyro1: pyro_1 {
+			gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
+			label = "Pyro Actuate 1";
+		};
+
+		  pyro2: pyro_2 {
+			gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
+			label = "Pyro Actuate 2";
+		};
+
+};
+
+	pyroSense {
+        compatible = "gpio-keys";
+        
+        pyro0_sense: pyro_0_sense {
+			gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;
+			label = "Pyro Sense 0";
+		};
+
+		  pyro1_sense: pyro_1_sense {
+			gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
+			label = "Pyro Sense 1";
+		};
+
+		  pyro2_sense: pyro_2_sense {
+			gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
+			label = "Pyro Sense 2";
+		};
+	};
+
+};

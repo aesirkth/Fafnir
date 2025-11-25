@@ -5,16 +5,18 @@
  */
 
 #include "can_com.h"
+#include "main.h"
 
-#include <stdio.h>
+#include <zephyr/logging/log.h>
 #include <zephyr/kernel.h>
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/pwm.h>
-#include "main.h"
 
 
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS   4000
+
+LOG_MODULE_REGISTER(main_func);
 
 
 /*
@@ -25,8 +27,11 @@
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_NODELABEL(led0), gpios);
 
+// Disable servo pwm if using board Native Sim 
+#if !defined(CONFIG_BOARD_NATIVE_SIM) 
 static const struct pwm_dt_spec pwm_servo = PWM_DT_SPEC_GET(DT_NODELABEL(servo));
 #define SERVO_PERIOD PWM_MSEC(20)
+#endif
 
 static const struct gpio_dt_spec pyro0_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro0_sense), gpios);
 static const struct gpio_dt_spec pyro1_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro1_sense), gpios);
@@ -67,7 +72,6 @@ volatile Command lastReceivedCommand = {0}; // possibly make this an "Option"
                                             // type to indicate if no command was received
 uint8_t pyroMask = 0b000;
 uint16_t targetAngle = 0;
-
 
 void processCommand(Command cmd) {
 
@@ -209,65 +213,100 @@ void servoZero(void) {
 void servoRotate(float angle) {
 	//The angle is mapped to -135 to 135 to properly represent CW and CCW rotations
 	//Input of +90 == 90 deg rotation CW from the zero position.
+    LOG_INF("setting angle of pwm_servo = %f\n", (double) angle);
 
-	if (angle < -135 || angle > 135) return;
-	angle = 135.0f + angle; //135 degrees is the zero/middle position, since the servo motor can rotate 270 deg
+    #if !defined(CONFIG_BOARD_NATIVE_SIM)
+    {
+        if (angle < -135 || angle > 135) return;
+        angle = 135.0f + angle; //135 degrees is the zero/middle position, since the servo motor can rotate 270 deg
 
-	float degRatio = angle / 270.0f;
+        float degRatio = angle / 270.0f;
 
-	float duty = degRatio * 0.10f + 0.025f;  //mapping to 2.5%–12.5% duty cycle
-	pwm_set_dt(&pwm_servo, SERVO_PERIOD, (uint32_t) SERVO_PERIOD*duty); // move it a bit
+        float duty = degRatio * 0.10f + 0.025f;  //mapping to 2.5%–12.5% duty cycle
+
+        pwm_set_dt(&pwm_servo, SERVO_PERIOD, (uint32_t) SERVO_PERIOD*duty); // move it a bit
+    }
+    #endif
+
 
 }
 
-
-
+static uint8_t data[2];
 
 int main(void)
 {
 	int ret;
-	bool led_state = true;
 
 	if (!gpio_is_ready_dt(&led)) {
 		return 0;
 	}
 
+    #if defined(CONFIG_BOARD_NATIVE_SIM) 
+    // gpio loopback mode
+	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE | GPIO_INPUT);
+	if (ret < 0) {
+		return 0;
+	}
+    #else
 	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
 	if (ret < 0) {
 		return 0;
 	}
+    #endif
 
+    #if !defined(CONFIG_BOARD_NATIVE_SIM) 
 	if (!pwm_is_ready_dt(&pwm_servo)) {
 		printk("Error: PWM device %s is not ready\n",
 		       pwm_servo.dev->name);
 		return 0;
 	}
+    #endif
 
-	ret = gpio_pin_configure_dt(&pyro0_sense, GPIO_INPUT);
-	if (ret != 0) {
-		printk("Error %d: failed to configure %s pin %d\n",
-		       ret, pyro0_sense.port->name, pyro0_sense.pin);
-		return 0;
-	}
 
-	servoZero();
-	k_msleep(SLEEP_TIME_MS);
-	servoRotate(90);
+	// ret = gpio_pin_configure_dt(&pyro0_sense, GPIO_INPUT);
+	// if (ret != 0) {
+	// 	printk("Error %d: failed to configure %s pin %d\n",
+	// 	       ret, pyro0_sense.port->name, pyro0_sense.pin);
+	// 	return 0;
+	// }
+
+    // LOG_INF("zeroing servo\n");
+	// servoZero();
+	// k_msleep(SLEEP_TIME_MS);
+	// servoRotate(90);
+
 
     volatile uint8_t can_scratchpad[100];
-    can_scratchpad[0] = 1;
+    can_scratchpad[0] = 0;
     init_can((void *) can_scratchpad);
+
+    LOG_INF("inititialised CAN\n");
+
+	// k_msleep(SLEEP_TIME_MS);
+
+    LOG_INF("submitting CAN packet\n");
+    data[0] = 39;
+    data[1] = 59;
+    submit_can_pkt(data, 2);
+
+    LOG_INF("running the while loop\n");
 
 	while (1) {
 		// ret = gpio_pin_toggle_dt(&led);
 		uint8_t senseState = pyroSense(0);
+        // if(can_scratchpad[0])
+        // LOG_INF("can_scratchpad[0]= %d", can_scratchpad[0]);
 
 		if (senseState == 69) {
 			printk("pyro0_sense failed");
 			return 0;
 		}
 
-		gpio_pin_set_dt(&led, can_scratchpad[0]);
+
+		gpio_pin_set_dt(&led, can_scratchpad[0] ? 1 : 0);
+		// LOG_INF("gpio_pin = %d and can_scratchpad[0]=%d 1 or 0 = %d", gpio_pin_get_dt(&led), can_scratchpad[0], can_scratchpad[0] ? 1 : 0);
+        // LOG_INF("can_scratchpad[0]= %d", can_scratchpad[0]);
+
 
 		k_msleep(50);
 	}
