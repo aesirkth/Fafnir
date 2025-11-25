@@ -13,10 +13,14 @@
 #include <zephyr/drivers/pwm.h>
 
 
+
 /* 1000 msec = 1 sec */
 #define SLEEP_TIME_MS   4000
 
+
 LOG_MODULE_REGISTER(main_func);
+
+
 
 
 /*
@@ -33,167 +37,58 @@ static const struct pwm_dt_spec pwm_servo = PWM_DT_SPEC_GET(DT_NODELABEL(servo))
 #define SERVO_PERIOD PWM_MSEC(20)
 #endif
 
-static const struct gpio_dt_spec pyro0_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro0_sense), gpios);
-static const struct gpio_dt_spec pyro1_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro1_sense), gpios);
-static const struct gpio_dt_spec pyro2_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro2_sense), gpios);
 
-static const struct gpio_dt_spec pyro0 = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro0), gpios);
-static const struct gpio_dt_spec pyro1 = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro1), gpios);
-static const struct gpio_dt_spec pyro2 = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro2), gpios);
+#if !defined(CONFIG_BOARD_NATIVE_SIM) 
+static const struct gpio_dt_spec main_valve = GPIO_DT_SPEC_GET(DT_ALIAS(mainvalve), gpios);
+#endif
 
-const struct gpio_dt_spec pyroSensePins[NUM_PYROS] = {pyro0_sense, pyro1_sense, pyro2_sense};
-const struct gpio_dt_spec pyroPins[NUM_PYROS] = {pyro0, pyro1, pyro2};
+static const struct gpio_dt_spec N2_valve = GPIO_DT_SPEC_GET(DT_ALIAS(n2valve), gpios);
+static const struct gpio_dt_spec vent_valve = GPIO_DT_SPEC_GET(DT_ALIAS(ventvalve), gpios);
+static const struct gpio_dt_spec abort_valve = GPIO_DT_SPEC_GET(DT_ALIAS(abortvalve), gpios);
+static const struct gpio_dt_spec ignition = GPIO_DT_SPEC_GET(DT_ALIAS(ignition), gpios);
 
+static const struct gpio_dt_spec N2_sense = GPIO_DT_SPEC_GET(DT_ALIAS(n2sense), gpios);
+static const struct gpio_dt_spec vent_sense = GPIO_DT_SPEC_GET(DT_ALIAS(ventsense), gpios);
+static const struct gpio_dt_spec main_sense = GPIO_DT_SPEC_GET(DT_ALIAS(mainsense), gpios);
+static const struct gpio_dt_spec abort_sense = GPIO_DT_SPEC_GET(DT_ALIAS(abortsense), gpios);
+static const struct gpio_dt_spec ignition_sense = GPIO_DT_SPEC_GET(DT_ALIAS(ignitionsense), gpios);
+
+#define NUM_CHANNELS 4
+const struct gpio_dt_spec solenoidSense[NUM_CHANNELS] = {N2_sense, vent_sense, abort_sense, ignition_sense};
+const struct gpio_dt_spec pyroPins[NUM_CHANNELS] = {N2_valve, vent_valve, abort_valve, ignition};
+// const struct gpio_dt_spec pyroSensePins[NUM_PYROS] = {pyro0_sense, pyro1_sense, pyro2_sense};
+// const struct gpio_dt_spec pyroPins[NUM_PYROS] = {pyro0, pyro1, pyro2};
+
+#define CAN_INITIALISE_ID 0x123
+#define CAN_IGNITION 0x124
 
 typedef enum {
     STATE_IDLE,
     STATE_INIT,
-    STATE_READY,
-    STATE_ACTUATE
+    STATE_FILL,
+    STATE_STOP_FILL,
+    STATE_UMBILICAL,
+    STATE_N2_PRESSURIZATION,
+    STATE_IGNITION_1,
+    STATE_IGNITION_2,
+    STATE_IGNITION_3,
+    STATE_SAFE,
+    STATE_ABORT
 } State;
 
-typedef enum {
-    CMD_NONE,
-    CMD_SERVO_ZERO,
-    CMD_SERVO_ROTATE,
-    CMD_PYRO_ACTUATE,
-    CMD_PYRO_DISABLE
-} CommandType;
+State systemState = STATE_IDLE;
+bool trigger = true;
 
-typedef struct {
-    CommandType type;
-    uint8_t pyroIndex;
-    uint16_t angle;
-} Command;
-
-State servoState = STATE_IDLE;
-State pyroState[NUM_PYROS] = {STATE_IDLE, STATE_IDLE, STATE_IDLE};
-volatile Command lastReceivedCommand = {0}; // possibly make this an "Option"
-                                            // type to indicate if no command was received
-uint8_t pyroMask = 0b000;
-uint16_t targetAngle = 0;
-
-void processCommand(Command cmd) {
-
-	if (systemIdle()) return;
-
-
-    switch (cmd.type) {
-        case CMD_SERVO_ZERO:
-            servoState = STATE_INIT;
-            break;
-
-        case CMD_SERVO_ROTATE:
-            targetAngle = cmd.angle;
-            if (servoState == STATE_READY) servoState = STATE_ACTUATE;
-            break;
-
-        case CMD_PYRO_ACTUATE:
-            if (cmd.pyroIndex < NUM_PYROS && pyroState[cmd.pyroIndex] == STATE_READY)
-                pyroState[cmd.pyroIndex] = STATE_ACTUATE;
-            break;
-
-        case CMD_PYRO_DISABLE:
-            if (cmd.pyroIndex < NUM_PYROS)
-                pyroState[cmd.pyroIndex] = STATE_INIT;
-            break;
-
-        default:
-            break;
-    }
+void timerCallback_1() { 
+    systemState = STATE_IGNITION_2;
+    LOG_INF("timer callback 1 triggered going into STATE_IGNITION_2!");
+    trigger = true;
 }
 
-uint8_t systemReady(void) {
-    if (servoState != STATE_READY)
-        return 0;
-
-    for (int i = 0; i < NUM_PYROS; i++) {
-        if (pyroState[i] != STATE_READY)
-            return 0;
-    }
-
-    return 1;
-} //essentially just check that everything is in the READY state for the first time, send the ready status to CAN to Fjalar
-
-uint8_t systemIdle(void) {
-	  if (servoState == STATE_IDLE) return 1;
-
-	    for (int i = 0; i < NUM_PYROS; i++) {
-	        if (pyroState[i] == STATE_IDLE)
-	            return 1;
-	    }
-
-	    return 0;
-}
-
-void handleServo(void) {
-    switch (servoState) {
-        case STATE_IDLE:
-            //Do nothing until we receive some initial command
-            break;
-
-        case STATE_INIT:
-            servoZero();
-            servoState = STATE_READY;
-            break;
-
-        case STATE_READY:
-            //Wait for rotation command
-            break;
-
-        case STATE_ACTUATE:
-            servoRotate(targetAngle);
-            servoState = STATE_READY;
-            break;
-    }
-}
-
-void handlePyro(int i) {
-    switch (pyroState[i]) {
-        case STATE_IDLE:
-            //Do nothing until we receive some initial command
-            break;
-
-        case STATE_INIT:
-            pyroActuate(i, 0);
-            if (pyroSense(i) == 0) { //Low = continuity detected
-                pyroState[i] = STATE_READY;
-            }
-            break;
-
-        case STATE_READY:
-            // WAit for actuation command
-            break;
-
-        case STATE_ACTUATE:
-            pyroActuate(i, 1);
-            //remain active until the CMD_PYRO_DISABLE is received
-            break;
-    }
-}
-
-void forceInit(void) {
-	//USED ONLY FOR DEBUGGING
-	servoState = STATE_INIT;
-	handleServo();
-	for (int i = 0; i < NUM_PYROS; i++) { 
-	    pyroState[i] = STATE_INIT;
-		handlePyro(i);
-
-	}
-
-}
-
-void pyroActuate(uint8_t index, uint8_t state) {
-	if (index >= NUM_PYROS) return;
-	if (state != 1 && state != 0) return;
-	gpio_pin_set_dt(&pyroPins[index], state);
-	
-    if (state) {
-    	pyroMask |=  (1 << index); //set union
-    } else {
-    	pyroMask &= ~(1 << index); //set intersection
-    }
+void timerCallback_2() { 
+    systemState = STATE_IGNITION_3;
+    LOG_INF("timer callback 2 triggered going into STATE_IGNITION_3!");
+    trigger = true;
 }
 
 uint8_t pyroSense(uint8_t index) {
@@ -201,7 +96,7 @@ uint8_t pyroSense(uint8_t index) {
     //HIGH = continuity detected (return 1)
     //LOW = open circuit (return 0)
 
-	int state = gpio_pin_get_dt(&pyroSensePins[index]);
+	int state = gpio_pin_get_dt(&solenoidSense[index]);
 
     return state;
 }
@@ -227,32 +122,154 @@ void servoRotate(float angle) {
         pwm_set_dt(&pwm_servo, SERVO_PERIOD, (uint32_t) SERVO_PERIOD*duty); // move it a bit
     }
     #endif
+}
+
+void can_rx_cb(const struct device *const device, struct can_frame *frame, void *user_data) {
+    switch (frame->id) {
+    case CAN_INITIALISE_ID:
+        systemState = STATE_INIT;
+        break;
+    case CAN_IGNITION:
+        systemState = STATE_IGNITION_1;
+        break;
+    
+    default:
+        break;
+    }
+    LOG_INF("Recieved CAN message rx: %#X: frame->dlc: %d. Switching state to %d", frame->id, frame->dlc, systemState);
 
 
+    trigger = true;
+
+    // TODO: should probably check size.
+    // if (frame->dlc != pkt_size[pkt_type]) {
+    //     LOG_ERR("received packet %#x has length %d but should be length %d", pkt_type, frame->dlc, pkt_size[pkt_type]);
+    // }
+
+    memcpy(user_data, frame->data, frame->dlc);
 }
 
 static uint8_t data[2];
+
+
+void configure_output_pin(const struct gpio_dt_spec *pin) {
+    // gpio_pin_configure_dt(pin, )
+
+	int ret;
+    ret = gpio_is_ready_dt(pin);
+    if (ret) {
+        return;
+    }
+
+    #if defined(CONFIG_BOARD_NATIVE_SIM) 
+    // gpio loopback mode
+    ret = gpio_pin_configure_dt(pin, GPIO_OUTPUT_ACTIVE | GPIO_INPUT);
+    if (ret < 0) {
+        return;
+    }
+    #else
+    ret = gpio_pin_configure_dt(pin, GPIO_OUTPUT_ACTIVE);
+    if (ret < 0) {
+        return;
+    }
+    #endif
+}
+
+void configure_input_pin(const struct gpio_dt_spec *pin) {
+    // gpio_pin_configure_dt(pin, )
+
+	int ret;
+    ret = gpio_is_ready_dt(pin);
+    if (ret) {
+        return;
+    }
+
+    #if defined(CONFIG_BOARD_NATIVE_SIM) 
+    // gpio loopback mode
+    ret = gpio_pin_configure_dt(pin, GPIO_OUTPUT_ACTIVE | GPIO_INPUT);
+    if (ret < 0) {
+        return;
+    }
+    #else
+    ret = gpio_pin_configure_dt(pin, GPIO_INPUT);
+    if (ret < 0) {
+        return;
+    }
+    #endif
+}
+
+void set_pin(const struct gpio_dt_spec *pin, bool value) {
+    LOG_INF("PIN[%d] set to value %d", pin->pin, value);
+    gpio_pin_set_dt(pin, value);
+}
+
+void resetState() {
+    // reset state
+}
+
+K_TIMER_DEFINE(timer_1, timerCallback_1, NULL);
+K_TIMER_DEFINE(timer_2, timerCallback_2, NULL);
+
+void evaluateState() { 
+    LOG_INF("Evaluating state: %d", systemState);
+    switch(systemState) {
+        case STATE_INIT:
+            set_pin(&vent_valve, 1);
+        break;
+
+        case STATE_FILL:
+        //nothing :)
+        break;
+
+        case STATE_STOP_FILL:
+            set_pin(&vent_valve, 0);
+        break;
+
+        case STATE_UMBILICAL:
+        //nothing :)
+        break;
+
+        case STATE_N2_PRESSURIZATION:
+            set_pin(&N2_valve, 1);
+        break;
+
+        case STATE_IGNITION_1:
+        //T-10 seconds
+            //wait
+        //buzzer and LED
+            k_timer_start(&timer_1, K_MSEC(7000), K_NO_WAIT);
+
+        break;
+
+        case STATE_IGNITION_2: 
+            //T-3 seconds
+            //servoRotate(10);
+            //delay(50ms)
+            k_timer_start(&timer_2, K_MSEC(3000), K_NO_WAIT);
+            //wait
+        break;
+
+        case STATE_IGNITION_3:
+            
+        break;
+ 
+        //T-0 Seconds
+        //servoRotate(90);
+        break;
+    }
+}
+
 
 int main(void)
 {
 	int ret;
 
-	if (!gpio_is_ready_dt(&led)) {
-		return 0;
-	}
+    configure_output_pin(&led);
 
-    #if defined(CONFIG_BOARD_NATIVE_SIM) 
-    // gpio loopback mode
-	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE | GPIO_INPUT);
-	if (ret < 0) {
-		return 0;
-	}
-    #else
-	ret = gpio_pin_configure_dt(&led, GPIO_OUTPUT_ACTIVE);
-	if (ret < 0) {
-		return 0;
-	}
-    #endif
+    for (size_t i = 0; i < NUM_CHANNELS; i++) {
+        configure_output_pin(&pyroPins[i]);
+        configure_input_pin(&solenoidSense[i]);
+    }
 
     #if !defined(CONFIG_BOARD_NATIVE_SIM) 
 	if (!pwm_is_ready_dt(&pwm_servo)) {
@@ -262,34 +279,20 @@ int main(void)
 	}
     #endif
 
-
-	// ret = gpio_pin_configure_dt(&pyro0_sense, GPIO_INPUT);
-	// if (ret != 0) {
-	// 	printk("Error %d: failed to configure %s pin %d\n",
-	// 	       ret, pyro0_sense.port->name, pyro0_sense.pin);
-	// 	return 0;
-	// }
-
-    // LOG_INF("zeroing servo\n");
-	// servoZero();
-	// k_msleep(SLEEP_TIME_MS);
-	// servoRotate(90);
-
-
     volatile uint8_t can_scratchpad[100];
     can_scratchpad[0] = 0;
-    init_can((void *) can_scratchpad);
+    init_can(can_rx_cb, (void *) can_scratchpad);
 
-    LOG_INF("inititialised CAN\n");
 
 	// k_msleep(SLEEP_TIME_MS);
 
-    LOG_INF("submitting CAN packet\n");
-    data[0] = 39;
-    data[1] = 59;
-    submit_can_pkt(data, 2);
+    // data[0] = 39;
+    // data[1] = 59;
+    // submit_can_pkt(data, 2);
 
-    LOG_INF("running the while loop\n");
+    
+    resetState();
+    set_pin(&N2_valve, 1);
 
 	while (1) {
 		// ret = gpio_pin_toggle_dt(&led);
@@ -302,8 +305,14 @@ int main(void)
 			return 0;
 		}
 
+        if(trigger) {
+            evaluateState();
+            trigger = false;
+        }
+        // set_pin(&led, can_scratchpad[0]);
 
-		gpio_pin_set_dt(&led, can_scratchpad[0] ? 1 : 0);
+
+		// set_pin(&led, can_scratchpad[0] ? 1 : 0);
 		// LOG_INF("gpio_pin = %d and can_scratchpad[0]=%d 1 or 0 = %d", gpio_pin_get_dt(&led), can_scratchpad[0], can_scratchpad[0] ? 1 : 0);
         // LOG_INF("can_scratchpad[0]= %d", can_scratchpad[0]);
 

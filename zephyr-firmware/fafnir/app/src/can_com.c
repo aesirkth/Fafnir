@@ -23,19 +23,6 @@ const struct can_filter filter = {
     .mask = 0b11110000000 
 };
 
-void can_rx_cb(const struct device *const device, struct can_frame *frame, void *user_data) {
-    LOG_INF("rx: %#X: frame->dlc: %d", frame->id, frame->dlc);
-
-     
-
-    // TODO: should probably check size.
-    // if (frame->dlc != pkt_size[pkt_type]) {
-    //     LOG_ERR("received packet %#x has length %d but should be length %d", pkt_type, frame->dlc, pkt_size[pkt_type]);
-    // }
-
-    memcpy(user_data, frame->data, frame->dlc);
-    
-}
 
 void can_tx_cb(const struct device *device, int error, void *user_data) {
     k_sem_give(&can_tx_done);
@@ -94,7 +81,7 @@ K_THREAD_DEFINE(can_thread,
                 0,
                 -1); // do not start
 
-int init_can(void *can_user_data) {
+int init_can(can_rx_callback_t rx_callback, void *can_user_data) {
     int ret;
 
  
@@ -105,7 +92,7 @@ int init_can(void *can_user_data) {
 
     can_set_mode(can_dev, CAN_MODE_LOOPBACK);
     
-    ret = can_add_rx_filter(can_dev, can_rx_cb, can_user_data, &filter);
+    ret = can_add_rx_filter(can_dev, rx_callback, can_user_data, &filter);
     if (ret < 0) {
         LOG_ERR("adding can filter failed: %d", ret);
     } else {
@@ -136,7 +123,7 @@ int init_can(void *can_user_data) {
         LOG_INF("CAN started");
     }
 
-    k_thread_start(can_thread);
+    // k_thread_start(can_thread);
 
     return 0;
 }
