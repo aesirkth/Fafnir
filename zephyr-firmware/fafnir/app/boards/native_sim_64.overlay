@@ -2,7 +2,21 @@
 / {
 	aliases {
 		fdcan1 = &can_loopback0;
+
+		N2_valve = &solenoid0;
+		vent_valve = &solenoid1;
+		main_valve = &solenoid2;
+		abort_valve = &solenoid3;
+		ignition = &ignition0;
+
+		N2_sense = &sense0
+		vent_sense = &sense1
+		main_sense = &sense2;
+		abort_sense = &sense3;
+		ignition_sense = &sense4;
+
 	};
+
 
     leds {
         compatible = "gpio-leds";
@@ -13,42 +27,61 @@
 		};
     };
 
-	pyro {
+	solenoids {
         compatible = "gpio-leds";
         
-        pyro0: pyro_0 {
+        solenoid0: sol_0 {
 			gpios = <&gpio0 8 GPIO_ACTIVE_HIGH>;
-			label = "Pyro Actuate 0";
+			label = "N2 Valve";
 		};
 
-		  pyro1: pyro_1 {
+		solenoid1: sol_1 {
 			gpios = <&gpio0 9 GPIO_ACTIVE_HIGH>;
-			label = "Pyro Actuate 1";
+			label = "Vent Valve";
 		};
 
-		  pyro2: pyro_2 {
+		solenoid2: sol_2 {
 			gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
-			label = "Pyro Actuate 2";
+			label = "Main Valve";
+		};
+
+		solenoid3: sol_3 {
+			gpios = <&gpio0 11 GPIO_ACTIVE_HIGH>;
+			label = "Abort Valve";
+		};
+
+		ignition0: ign_0 {
+			gpios = <&gpio0 12 GPIO_ACTIVE_HIGH>;
+			label = "Ignition";
 		};
 
 };
 
-	pyroSense {
+	solenoidSense {
         compatible = "gpio-keys";
         
-        pyro0_sense: pyro_0_sense {
+        sense0: sense_0 {
 			gpios = <&gpio0 15 GPIO_ACTIVE_LOW>;
-			label = "Pyro Sense 0";
+			label = "N2 Sense";
 		};
 
-		  pyro1_sense: pyro_1_sense {
+		  sense1: sense_1 {
 			gpios = <&gpio0 14 GPIO_ACTIVE_LOW>;
-			label = "Pyro Sense 1";
+			label = "Vent Sense";
 		};
 
-		  pyro2_sense: pyro_2_sense {
+		  sense2: sense_2 {
 			gpios = <&gpio0 13 GPIO_ACTIVE_LOW>;
-			label = "Pyro Sense 2";
+			label = "Main Sense";
+		};
+		
+		  sense3: sense_3 {
+			gpios = <&gpio0 12 GPIO_ACTIVE_LOW>;
+			label = "Abort Sense";
+		};
+			sense4: sense_4 {
+			gpios = <&gpio0 11 GPIO_ACTIVE_LOW>;
+			label = "Ignitino Sense";
 		};
 	};
 

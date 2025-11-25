@@ -33,117 +33,42 @@ static const struct pwm_dt_spec pwm_servo = PWM_DT_SPEC_GET(DT_NODELABEL(servo))
 #define SERVO_PERIOD PWM_MSEC(20)
 #endif
 
-static const struct gpio_dt_spec pyro0_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro0_sense), gpios);
-static const struct gpio_dt_spec pyro1_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro1_sense), gpios);
-static const struct gpio_dt_spec pyro2_sense = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro2_sense), gpios);
+#define NUM_CHANNELS 5
 
-static const struct gpio_dt_spec pyro0 = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro0), gpios);
-static const struct gpio_dt_spec pyro1 = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro1), gpios);
-static const struct gpio_dt_spec pyro2 = GPIO_DT_SPEC_GET(DT_NODELABEL(pyro2), gpios);
+static const struct gpio_dt_spec N2_valve = GPIO_DT_SPEC_GET(DT_NODEALIAS(N2_valve), gpios);
+static const struct gpio_dt_spec vent_valve = GPIO_DT_SPEC_GET(DT_NODEALIAS(vent_valve), gpios);
+static const struct gpio_dt_spec main_valve = GPIO_DT_SPEC_GET(DT_NODEALIAS(main_valve), gpios);
+static const struct gpio_dt_spec abort_valve = GPIO_DT_SPEC_GET(DT_NODEALIAS(abort_valve), gpios);
+static const struct gpio_dt_spec ignition = GPIO_DT_SPEC_GET(DT_NODEALIAS(ignition), gpios);
 
-const struct gpio_dt_spec pyroSensePins[NUM_PYROS] = {pyro0_sense, pyro1_sense, pyro2_sense};
-const struct gpio_dt_spec pyroPins[NUM_PYROS] = {pyro0, pyro1, pyro2};
+static const struct gpio_dt_spec N2_sense = GPIO_DT_SPEC_GET(DT_NODEALIAS(N2_sense), gpios);
+static const struct gpio_dt_spec vent_sense = GPIO_DT_SPEC_GET(DT_NODEALIAS(vent_sense), gpios);
+static const struct gpio_dt_spec main_sense = GPIO_DT_SPEC_GET(DT_NODEALIAS(main_sense), gpios);
+static const struct gpio_dt_spec abort_sense = GPIO_DT_SPEC_GET(DT_NODEALIAS(abort_sense), gpios);
+static const struct gpio_dt_spec ignition_sense = GPIO_DT_SPEC_GET(DT_NODEALIAS(ignition_sense), gpios);
 
+
+const struct gpio_dt_spec pyroSensePins[NUM_CHANNELS] = {N2_valve, vent_valve, main_valve, abort_valve, ignition};
+const struct gpio_dt_spec pyroPins[NUM_CHANNELS] = {N2_sense, vent_valve, main_sense, abort_sense, ignition_sense};
 
 typedef enum {
     STATE_IDLE,
     STATE_INIT,
-    STATE_READY,
-    STATE_ACTUATE
+    STATE_FILL,
+    STATE_STOP_FILL,
+    STATE_UMBILICAL,
+    STATE_N2_PRESSURIZATION,
+    STATE_IGNITION,
+    STATE_SAFE,
+    STATE_ABORT,
 } State;
 
-typedef enum {
-    CMD_NONE,
-    CMD_SERVO_ZERO,
-    CMD_SERVO_ROTATE,
-    CMD_PYRO_ACTUATE,
-    CMD_PYRO_DISABLE
-} CommandType;
 
-typedef struct {
-    CommandType type;
-    uint8_t pyroIndex;
-    uint16_t angle;
-} Command;
-
-State servoState = STATE_IDLE;
-State pyroState[NUM_PYROS] = {STATE_IDLE, STATE_IDLE, STATE_IDLE};
-volatile Command lastReceivedCommand = {0}; // possibly make this an "Option"
-                                            // type to indicate if no command was received
-uint8_t pyroMask = 0b000;
-uint16_t targetAngle = 0;
-
-void processCommand(Command cmd) {
-
-	if (systemIdle()) return;
-
-
-    switch (cmd.type) {
-        case CMD_SERVO_ZERO:
-            servoState = STATE_INIT;
-            break;
-
-        case CMD_SERVO_ROTATE:
-            targetAngle = cmd.angle;
-            if (servoState == STATE_READY) servoState = STATE_ACTUATE;
-            break;
-
-        case CMD_PYRO_ACTUATE:
-            if (cmd.pyroIndex < NUM_PYROS && pyroState[cmd.pyroIndex] == STATE_READY)
-                pyroState[cmd.pyroIndex] = STATE_ACTUATE;
-            break;
-
-        case CMD_PYRO_DISABLE:
-            if (cmd.pyroIndex < NUM_PYROS)
-                pyroState[cmd.pyroIndex] = STATE_INIT;
-            break;
-
-        default:
-            break;
-    }
-}
-
-uint8_t systemReady(void) {
-    if (servoState != STATE_READY)
-        return 0;
-
-    for (int i = 0; i < NUM_PYROS; i++) {
-        if (pyroState[i] != STATE_READY)
-            return 0;
-    }
-
-    return 1;
-} //essentially just check that everything is in the READY state for the first time, send the ready status to CAN to Fjalar
-
-uint8_t systemIdle(void) {
-	  if (servoState == STATE_IDLE) return 1;
-
-	    for (int i = 0; i < NUM_PYROS; i++) {
-	        if (pyroState[i] == STATE_IDLE)
-	            return 1;
-	    }
-
-	    return 0;
-}
 
 void handleServo(void) {
     switch (servoState) {
         case STATE_IDLE:
             //Do nothing until we receive some initial command
-            break;
-
-        case STATE_INIT:
-            servoZero();
-            servoState = STATE_READY;
-            break;
-
-        case STATE_READY:
-            //Wait for rotation command
-            break;
-
-        case STATE_ACTUATE:
-            servoRotate(targetAngle);
-            servoState = STATE_READY;
             break;
     }
 }
@@ -153,58 +78,9 @@ void handlePyro(int i) {
         case STATE_IDLE:
             //Do nothing until we receive some initial command
             break;
-
-        case STATE_INIT:
-            pyroActuate(i, 0);
-            if (pyroSense(i) == 0) { //Low = continuity detected
-                pyroState[i] = STATE_READY;
-            }
-            break;
-
-        case STATE_READY:
-            // WAit for actuation command
-            break;
-
-        case STATE_ACTUATE:
-            pyroActuate(i, 1);
-            //remain active until the CMD_PYRO_DISABLE is received
-            break;
     }
 }
 
-void forceInit(void) {
-	//USED ONLY FOR DEBUGGING
-	servoState = STATE_INIT;
-	handleServo();
-	for (int i = 0; i < NUM_PYROS; i++) { 
-	    pyroState[i] = STATE_INIT;
-		handlePyro(i);
-
-	}
-
-}
-
-void pyroActuate(uint8_t index, uint8_t state) {
-	if (index >= NUM_PYROS) return;
-	if (state != 1 && state != 0) return;
-	gpio_pin_set_dt(&pyroPins[index], state);
-	
-    if (state) {
-    	pyroMask |=  (1 << index); //set union
-    } else {
-    	pyroMask &= ~(1 << index); //set intersection
-    }
-}
-
-uint8_t pyroSense(uint8_t index) {
-	if (index >= NUM_PYROS) return 69; //69 means error
-    //HIGH = continuity detected (return 1)
-    //LOW = open circuit (return 0)
-
-	int state = gpio_pin_get_dt(&pyroSensePins[index]);
-
-    return state;
-}
 
 void servoZero(void) {
 	servoRotate(0.0f);
@@ -227,11 +103,8 @@ void servoRotate(float angle) {
         pwm_set_dt(&pwm_servo, SERVO_PERIOD, (uint32_t) SERVO_PERIOD*duty); // move it a bit
     }
     #endif
-
-
 }
 
-static uint8_t data[2];
 
 int main(void)
 {
