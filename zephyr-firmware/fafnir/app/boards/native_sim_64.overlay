@@ -3,17 +3,17 @@
 	aliases {
 		fdcan1 = &can_loopback0;
 
-		N2_valve = &solenoid0;
-		vent_valve = &solenoid1;
-		main_valve = &solenoid2;
-		abort_valve = &solenoid3;
+		N2 = &solenoid0;
+		vent = &solenoid1;
+		main = &solenoid2;
+		abort = &solenoid3;
 		ignition = &ignition0;
 
-		N2_sense = &sense0
-		vent_sense = &sense1
-		main_sense = &sense2;
-		abort_sense = &sense3;
-		ignition_sense = &sense4;
+		N2sense = &sense0
+		ventsense = &sense1
+		mainsense = &sense2;
+		abortsense = &sense3;
+		ignitionsense = &sense4;
 
 	};
 

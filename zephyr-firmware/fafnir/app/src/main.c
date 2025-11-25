@@ -48,8 +48,8 @@ static const struct gpio_dt_spec abort_sense = GPIO_DT_SPEC_GET(DT_NODEALIAS(abo
 static const struct gpio_dt_spec ignition_sense = GPIO_DT_SPEC_GET(DT_NODEALIAS(ignition_sense), gpios);
 
 
-const struct gpio_dt_spec pyroSensePins[NUM_CHANNELS] = {N2_valve, vent_valve, main_valve, abort_valve, ignition};
-const struct gpio_dt_spec pyroPins[NUM_CHANNELS] = {N2_sense, vent_valve, main_sense, abort_sense, ignition_sense};
+const struct gpio_dt_spec solenoidSense[NUM_CHANNELS] = {N2_valve, vent_valve, main_valve, abort_valve, ignition};
+const struct gpio_dt_spec solenoidPin[NUM_CHANNELS] = {N2_sense, vent_valve, main_sense, abort_sense, ignition_sense};
 
 typedef enum {
     STATE_IDLE,
@@ -63,23 +63,9 @@ typedef enum {
     STATE_ABORT,
 } State;
 
+State fafnir_state = STATE_IDLE;
+bool trigger = false;
 
-
-void handleServo(void) {
-    switch (servoState) {
-        case STATE_IDLE:
-            //Do nothing until we receive some initial command
-            break;
-    }
-}
-
-void handlePyro(int i) {
-    switch (pyroState[i]) {
-        case STATE_IDLE:
-            //Do nothing until we receive some initial command
-            break;
-    }
-}
 
 
 void servoZero(void) {
@@ -105,6 +91,44 @@ void servoRotate(float angle) {
     #endif
 }
 
+void resetState(); { 
+    //reset all pins
+}
+
+void evaluateState() { 
+    switch(fafnir_state) {
+        case STATE_INIT:
+        gpio_pin_set_dt(&vent_valve, 1);
+        break;
+
+        case STATE_FILL:
+        //nothing :)
+        break;
+
+        case STATE_STOP_FILL:
+        gpio_pin_set_dt(&vent_valve, 0);
+        break;
+
+        case STATE_UMBILICAL:
+        //nothing :)
+        break;
+
+        case N2_PRESSURIZATION:
+        gpio_pin_set_dt(&N2_valve, 1);
+        break;
+
+        case IGNITION:
+        //T-10 seconds
+            //wait
+        //T-3 seconds
+            //servoRotate(10);
+            //Open main valve 
+            //wait...
+        //T-0 Seconds
+        //servoRotate(90);
+        break;
+    }
+}
 
 int main(void)
 {
@@ -164,24 +188,11 @@ int main(void)
 
     LOG_INF("running the while loop\n");
 
+    resetState();
+
 	while (1) {
-		// ret = gpio_pin_toggle_dt(&led);
-		uint8_t senseState = pyroSense(0);
-        // if(can_scratchpad[0])
-        // LOG_INF("can_scratchpad[0]= %d", can_scratchpad[0]);
 
-		if (senseState == 69) {
-			printk("pyro0_sense failed");
-			return 0;
-		}
-
-
-		gpio_pin_set_dt(&led, can_scratchpad[0] ? 1 : 0);
-		// LOG_INF("gpio_pin = %d and can_scratchpad[0]=%d 1 or 0 = %d", gpio_pin_get_dt(&led), can_scratchpad[0], can_scratchpad[0] ? 1 : 0);
-        // LOG_INF("can_scratchpad[0]= %d", can_scratchpad[0]);
-
-
-		k_msleep(50);
+        
 	}
 	return 0;
 }
