@@ -5,6 +5,7 @@
  */
 
 #include "can_com.h"
+#include "gpio_emul_shell.h"
 #include "main.h"
 
 #include <zephyr/logging/log.h>
@@ -19,9 +20,6 @@
 
 
 LOG_MODULE_REGISTER(main_func);
-
-
-
 
 /*
  * A build error on this line means your board is unsupported.
@@ -59,8 +57,11 @@ const struct gpio_dt_spec pyroPins[NUM_CHANNELS] = {N2_valve, vent_valve, abort_
 // const struct gpio_dt_spec pyroSensePins[NUM_PYROS] = {pyro0_sense, pyro1_sense, pyro2_sense};
 // const struct gpio_dt_spec pyroPins[NUM_PYROS] = {pyro0, pyro1, pyro2};
 
-#define CAN_INITIALISE_ID 0x123
-#define CAN_IGNITION 0x124
+
+
+size_t CAN_IDS[] = {
+    
+};
 
 typedef enum {
     STATE_IDLE,
@@ -80,12 +81,16 @@ State systemState = STATE_IDLE;
 bool trigger = true;
 
 void timerCallback_1() { 
+    if(systemState == STATE_ABORT) return;
+
     systemState = STATE_IGNITION_2;
     LOG_INF("timer callback 1 triggered going into STATE_IGNITION_2!");
     trigger = true;
 }
 
 void timerCallback_2() { 
+    if(systemState == STATE_ABORT) return;
+
     systemState = STATE_IGNITION_3;
     LOG_INF("timer callback 2 triggered going into STATE_IGNITION_3!");
     trigger = true;
@@ -125,17 +130,12 @@ void servoRotate(float angle) {
 }
 
 void can_rx_cb(const struct device *const device, struct can_frame *frame, void *user_data) {
-    switch (frame->id) {
-    case CAN_INITIALISE_ID:
-        systemState = STATE_INIT;
-        break;
-    case CAN_IGNITION:
-        systemState = STATE_IGNITION_1;
-        break;
-    
-    default:
-        break;
-    }
+
+    // if(frame->id == STATE_IGNITION 
+    // ) return;
+
+    //     systemState = frame->id;
+
     LOG_INF("Recieved CAN message rx: %#X: frame->dlc: %d. Switching state to %d", frame->id, frame->dlc, systemState);
 
 
@@ -156,46 +156,42 @@ void configure_output_pin(const struct gpio_dt_spec *pin) {
     // gpio_pin_configure_dt(pin, )
 
 	int ret;
-    ret = gpio_is_ready_dt(pin);
-    if (ret) {
+    int ready = gpio_is_ready_dt(pin);
+    if (!ready) {
+        LOG_ERR("pin not ready");
         return;
     }
 
     #if defined(CONFIG_BOARD_NATIVE_SIM) 
-    // gpio loopback mode
-    ret = gpio_pin_configure_dt(pin, GPIO_OUTPUT_ACTIVE | GPIO_INPUT);
-    if (ret < 0) {
-        return;
-    }
+    ret = gpio_pin_configure_dt(pin, GPIO_OUTPUT);
     #else
-    ret = gpio_pin_configure_dt(pin, GPIO_OUTPUT_ACTIVE);
+    ret = gpio_pin_configure_dt(pin, GPIO_OUTPUT);
+    #endif
     if (ret < 0) {
+        LOG_ERR("pin configure failed %d", ret);
         return;
     }
-    #endif
 }
 
 void configure_input_pin(const struct gpio_dt_spec *pin) {
     // gpio_pin_configure_dt(pin, )
 
 	int ret;
-    ret = gpio_is_ready_dt(pin);
-    if (ret) {
+    int ready = gpio_is_ready_dt(pin);
+    if (!ready) {
+        LOG_ERR("pin not ready");
         return;
     }
 
     #if defined(CONFIG_BOARD_NATIVE_SIM) 
-    // gpio loopback mode
-    ret = gpio_pin_configure_dt(pin, GPIO_OUTPUT_ACTIVE | GPIO_INPUT);
-    if (ret < 0) {
-        return;
-    }
+    ret = gpio_pin_configure_dt(pin, GPIO_INPUT);
     #else
     ret = gpio_pin_configure_dt(pin, GPIO_INPUT);
+    #endif
     if (ret < 0) {
+        LOG_ERR("pin configure failed %d", ret);
         return;
     }
-    #endif
 }
 
 void set_pin(const struct gpio_dt_spec *pin, bool value) {
@@ -264,12 +260,6 @@ int main(void)
 {
 	int ret;
 
-    configure_output_pin(&led);
-
-    for (size_t i = 0; i < NUM_CHANNELS; i++) {
-        configure_output_pin(&pyroPins[i]);
-        configure_input_pin(&solenoidSense[i]);
-    }
 
     #if !defined(CONFIG_BOARD_NATIVE_SIM) 
 	if (!pwm_is_ready_dt(&pwm_servo)) {
@@ -290,20 +280,28 @@ int main(void)
     // data[1] = 59;
     // submit_can_pkt(data, 2);
 
+    configure_output_pin(&led);
+
+
+    for (size_t i = 0; i < NUM_CHANNELS; i++) {
+        configure_output_pin(&pyroPins[i]);
+        configure_input_pin(&solenoidSense[i]);
+    }
+
     
     resetState();
     set_pin(&N2_valve, 1);
 
 	while (1) {
 		// ret = gpio_pin_toggle_dt(&led);
-		uint8_t senseState = pyroSense(0);
-        // if(can_scratchpad[0])
-        // LOG_INF("can_scratchpad[0]= %d", can_scratchpad[0]);
+		// uint8_t senseState = pyroSense(0);
+        // // if(can_scratchpad[0])
+        // // LOG_INF("can_scratchpad[0]= %d", can_scratchpad[0]);
 
-		if (senseState == 69) {
-			printk("pyro0_sense failed");
-			return 0;
-		}
+		// if (senseState == 69) {
+		// 	printk("pyro0_sense failed");
+		// 	return 0;
+		// }
 
         if(trigger) {
             evaluateState();
