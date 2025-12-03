@@ -21,12 +21,6 @@
 
 LOG_MODULE_REGISTER(main_func);
 
-/*
- * A build error on this line means your board is unsupported.
- * See the sample documentation for information on how to fix this.
- */
-
-
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_NODELABEL(led0), gpios);
 
 // Disable servo pwm if using board Native Sim 
@@ -35,9 +29,9 @@ static const struct pwm_dt_spec pwm_servo = PWM_DT_SPEC_GET(DT_NODELABEL(servo))
 #define SERVO_PERIOD PWM_MSEC(20)
 #endif
 
-
 #if !defined(CONFIG_BOARD_NATIVE_SIM) 
-static const struct gpio_dt_spec main_valve = GPIO_DT_SPEC_GET(DT_ALIAS(mainvalve), gpios);
+// TODO: Need to define alias for servo main_valve
+static const struct gpio_dt_spec main_valve = PWM_DT_SPEC_GET(DT_ALIAS(main_valve));
 #endif
 
 static const struct gpio_dt_spec N2_valve = GPIO_DT_SPEC_GET(DT_ALIAS(n2valve), gpios);
@@ -54,14 +48,7 @@ static const struct gpio_dt_spec ignition_sense = GPIO_DT_SPEC_GET(DT_ALIAS(igni
 #define NUM_CHANNELS 4
 const struct gpio_dt_spec solenoidSense[NUM_CHANNELS] = {N2_sense, vent_sense, abort_sense, ignition_sense};
 const struct gpio_dt_spec pyroPins[NUM_CHANNELS] = {N2_valve, vent_valve, abort_valve, ignition};
-// const struct gpio_dt_spec pyroSensePins[NUM_PYROS] = {pyro0_sense, pyro1_sense, pyro2_sense};
-// const struct gpio_dt_spec pyroPins[NUM_PYROS] = {pyro0, pyro1, pyro2};
 
-
-
-size_t CAN_IDS[] = {
-    
-};
 
 typedef enum {
     STATE_IDLE,
@@ -73,26 +60,92 @@ typedef enum {
     STATE_IGNITION_1,
     STATE_IGNITION_2,
     STATE_IGNITION_3,
+    STATE_IGNITION_4,
     STATE_SAFE,
-    STATE_ABORT
-} State;
+    STATE_ABORT_BEFORE_COUNTDOWN,
+    STATE_ABORT_AFTER_COUNTDOWN
+} State_t;
 
-State systemState = STATE_IDLE;
+State_t systemState = STATE_IDLE;
 bool trigger = true;
 
-void timerCallback_1() { 
-    if(systemState == STATE_ABORT) return;
+bool isStateBeforeCountdown(State_t state) {
+    switch (state) {
+    case STATE_IDLE:
+        return false;
+    case STATE_INIT:
+        return false;
+    case STATE_FILL:
+        return false;
+    case STATE_STOP_FILL:
+        return false;
+    case STATE_UMBILICAL:
+        return false;
+    case STATE_N2_PRESSURIZATION:
+        return false;
+    case STATE_IGNITION_1:
+        return false;
+    case STATE_IGNITION_2:
+        return false;
+    case STATE_IGNITION_3:
+        return true; // TODO: What counts as "before countdown"?
+    case STATE_IGNITION_4:
+        return true;
+    case STATE_SAFE:
+        return true;
+    case STATE_ABORT_BEFORE_COUNTDOWN:
+        return true;
+    case STATE_ABORT_AFTER_COUNTDOWN:
+        return true;
+    }
+    LOG_ERR("Invalid state passed!");
+    return true;
+}
+
+/* 
+ * A CAN message with `data`, is interpreted as a command meaning:
+ * "Change your state to `state_can_id_map[data]`".
+*/
+State_t state_can_id_map[] = {
+    STATE_INIT,
+    STATE_FILL,
+    STATE_STOP_FILL,
+    STATE_UMBILICAL,
+    STATE_N2_PRESSURIZATION,
+    STATE_IGNITION_1,
+    STATE_SAFE,
+    STATE_ABORT_BEFORE_COUNTDOWN // Used for any abort message, not just before countdown.
+};
+
+void changeStateToIgnition2_cb() { 
+    if(systemState != STATE_IGNITION_1) return;
 
     systemState = STATE_IGNITION_2;
-    LOG_INF("timer callback 1 triggered going into STATE_IGNITION_2!");
+    LOG_INF("changeStateToIgnition2_cb triggered going into STATE_IGNITION_2!");
     trigger = true;
 }
 
-void timerCallback_2() { 
-    if(systemState == STATE_ABORT) return;
+void changeStateToIgnition3_cb() { 
+    if(systemState != STATE_IGNITION_2) return;
 
     systemState = STATE_IGNITION_3;
-    LOG_INF("timer callback 2 triggered going into STATE_IGNITION_3!");
+    LOG_INF("changeStateToIgnition3_cb triggered going into STATE_IGNITION_3!");
+    trigger = true;
+}
+
+void changeStateToIgnition4_cb() { 
+    if(systemState != STATE_IGNITION_3) return;
+
+    systemState = STATE_IGNITION_4;
+    LOG_INF("changeStateToIgnition4_cb triggered going into STATE_IGNITION_4!");
+    trigger = true;
+}
+
+void changeStateToSafeing_cb() { 
+    if(systemState != STATE_IGNITION_4) return;
+
+    systemState = STATE_SAFE;
+    LOG_INF("changeStateToSafeing_cb triggered going into STATE_SAFE!");
     trigger = true;
 }
 
@@ -113,7 +166,7 @@ void servoZero(void) {
 void servoRotate(float angle) {
 	//The angle is mapped to -135 to 135 to properly represent CW and CCW rotations
 	//Input of +90 == 90 deg rotation CW from the zero position.
-    LOG_INF("setting angle of pwm_servo = %f\n", (double) angle);
+    LOG_INF("setting angle of pwm_servo = %d\n", (int) angle);
 
     #if !defined(CONFIG_BOARD_NATIVE_SIM)
     {
@@ -129,32 +182,85 @@ void servoRotate(float angle) {
     #endif
 }
 
+void set_pin(const struct gpio_dt_spec *pin, bool value) {
+    LOG_INF("PIN[%d] set to value %d", pin->pin, value);
+    gpio_pin_set_dt(pin, value);
+}
+
+
+const struct can_filter filter = {
+    .flags = 0,
+    .id = 0x123,
+    .mask = 0b11111111111 
+};
 void can_rx_cb(const struct device *const device, struct can_frame *frame, void *user_data) {
 
-    // if(frame->id == STATE_IGNITION 
-    // ) return;
+    if (frame->dlc != 1) {
+        LOG_ERR("received packet with id %d has length %d. Fafnir expects all packets to have size 1.", frame->id, frame->dlc);
+    }
 
-    //     systemState = frame->id;
+    if(systemState == STATE_ABORT_BEFORE_COUNTDOWN || systemState == STATE_ABORT_AFTER_COUNTDOWN) {
+        LOG_ERR("CAN message recieved but ignored because system is aborted.");
+        return;
+    }
+
+    size_t message_data = frame->data[0];
+    State_t message_state = state_can_id_map[message_data];
+
+    if (message_state == STATE_ABORT_BEFORE_COUNTDOWN) {
+        if(isStateBeforeCountdown(systemState)) {
+            systemState = STATE_ABORT_BEFORE_COUNTDOWN;
+        } else {
+            systemState = STATE_ABORT_AFTER_COUNTDOWN;
+        }
+    } else {
+        systemState = state_can_id_map[message_data];
+    }
 
     LOG_INF("Recieved CAN message rx: %#X: frame->dlc: %d. Switching state to %d", frame->id, frame->dlc, systemState);
 
-
     trigger = true;
+}
 
-    // TODO: should probably check size.
-    // if (frame->dlc != pkt_size[pkt_type]) {
-    //     LOG_ERR("received packet %#x has length %d but should be length %d", pkt_type, frame->dlc, pkt_size[pkt_type]);
-    // }
+const struct can_filter override_filter = {
+    .flags = 0,
+    .id = 0x124,
+    .mask = 0b11111111111 
+};
+void can_rx_override_cb(const struct device *const device, struct can_frame *frame, void *user_data) {
 
-    memcpy(user_data, frame->data, frame->dlc);
+    if (frame->dlc != 2) {
+        LOG_ERR("received packet with id %d has length %d. Override requires 2 arguments PIN, VALUE.", frame->id, frame->dlc);
+    }
+    size_t pin = frame->data[0];
+    size_t value = frame->data[1];
+
+    LOG_INF("Recieved CAN message rx: %#X: frame->dlc: %d. Setting pin[%d] := %d", frame->id, frame->dlc, pin, value);
+    switch (pin) {
+    case 0:
+        set_pin(&N2_valve, value);
+        break;
+    case 1:
+        set_pin(&vent_valve, value);
+        break;
+    case 3:
+        set_pin(&abort_valve, value);
+        break;
+    case 4:
+        set_pin(&ignition, value);
+        break;
+    case 5:
+        int8_t signed_value = (int8_t) value;
+        servoRotate(90.0 * ((double) signed_value/127.0) );
+        break;
+
+    }
 }
 
 static uint8_t data[2];
 
 
 void configure_output_pin(const struct gpio_dt_spec *pin) {
-    // gpio_pin_configure_dt(pin, )
-
 	int ret;
     int ready = gpio_is_ready_dt(pin);
     if (!ready) {
@@ -162,11 +268,8 @@ void configure_output_pin(const struct gpio_dt_spec *pin) {
         return;
     }
 
-    #if defined(CONFIG_BOARD_NATIVE_SIM) 
     ret = gpio_pin_configure_dt(pin, GPIO_OUTPUT);
-    #else
-    ret = gpio_pin_configure_dt(pin, GPIO_OUTPUT);
-    #endif
+
     if (ret < 0) {
         LOG_ERR("pin configure failed %d", ret);
         return;
@@ -174,8 +277,6 @@ void configure_output_pin(const struct gpio_dt_spec *pin) {
 }
 
 void configure_input_pin(const struct gpio_dt_spec *pin) {
-    // gpio_pin_configure_dt(pin, )
-
 	int ret;
     int ready = gpio_is_ready_dt(pin);
     if (!ready) {
@@ -183,76 +284,140 @@ void configure_input_pin(const struct gpio_dt_spec *pin) {
         return;
     }
 
-    #if defined(CONFIG_BOARD_NATIVE_SIM) 
     ret = gpio_pin_configure_dt(pin, GPIO_INPUT);
-    #else
-    ret = gpio_pin_configure_dt(pin, GPIO_INPUT);
-    #endif
     if (ret < 0) {
         LOG_ERR("pin configure failed %d", ret);
         return;
     }
 }
 
-void set_pin(const struct gpio_dt_spec *pin, bool value) {
-    LOG_INF("PIN[%d] set to value %d", pin->pin, value);
-    gpio_pin_set_dt(pin, value);
-}
-
-void resetState() {
-    // reset state
-}
-
-K_TIMER_DEFINE(timer_1, timerCallback_1, NULL);
-K_TIMER_DEFINE(timer_2, timerCallback_2, NULL);
+K_TIMER_DEFINE(TMinus7_timer, changeStateToIgnition2_cb, NULL);
+K_TIMER_DEFINE(TMinus2_timer, changeStateToIgnition3_cb, NULL);
+K_TIMER_DEFINE(TMinus0_timer, changeStateToIgnition4_cb, NULL);
+K_TIMER_DEFINE(TPlus30_timer, changeStateToSafeing_cb, NULL);
 
 void evaluateState() { 
     LOG_INF("Evaluating state: %d", systemState);
     switch(systemState) {
-        case STATE_INIT:
-            set_pin(&vent_valve, 1);
+        case STATE_IDLE:
+            set_pin(&N2_valve, 0);
+            set_pin(&vent_valve, 0);
+            set_pin(&abort_valve, 0);
+            servoZero(); // Close Main Valve TODO: Is this correct? 
+            set_pin(&led, 0);
         break;
-
+        case STATE_INIT:
+            set_pin(&N2_valve, 0);
+            set_pin(&vent_valve, 1);
+            set_pin(&abort_valve, 0);
+            servoZero();
+            set_pin(&led, 0);
+        break;
         case STATE_FILL:
-        //nothing :)
+            // Same as STATE_INIT
+            set_pin(&N2_valve, 0);
+            set_pin(&vent_valve, 1);
+            set_pin(&abort_valve, 0);
+            servoZero();
+            set_pin(&led, 0);
         break;
 
         case STATE_STOP_FILL:
+            set_pin(&N2_valve, 0);
             set_pin(&vent_valve, 0);
+            set_pin(&abort_valve, 0);
+            servoZero();
+            set_pin(&led, 0);
         break;
 
         case STATE_UMBILICAL:
-        //nothing :)
+            // Same as STATE_STOP_FILL
+            set_pin(&N2_valve, 0);
+            set_pin(&vent_valve, 0);
+            set_pin(&abort_valve, 0);
+            servoZero();
+            set_pin(&led, 0);
         break;
 
         case STATE_N2_PRESSURIZATION:
             set_pin(&N2_valve, 1);
+            set_pin(&vent_valve, 0);
+            set_pin(&abort_valve, 0);
+            servoZero();
+            set_pin(&led, 0);
         break;
 
         case STATE_IGNITION_1:
-        //T-10 seconds
-            //wait
-        //buzzer and LED
-            k_timer_start(&timer_1, K_MSEC(7000), K_NO_WAIT);
-
+            set_pin(&N2_valve, 1);
+            set_pin(&vent_valve, 0);
+            set_pin(&abort_valve, 0);
+            servoZero();
+            set_pin(&led, 1);
+            // TODO: Buzzer
+            // TODO: Are the times correct? Maybe confused about T-10, T-7, etc...
+            // It is now T-10, 3000ms until T-7.
+            k_timer_start(&TMinus7_timer, K_MSEC(3000), K_NO_WAIT);
         break;
 
         case STATE_IGNITION_2: 
-            //T-3 seconds
-            //servoRotate(10);
-            //delay(50ms)
-            k_timer_start(&timer_2, K_MSEC(3000), K_NO_WAIT);
-            //wait
+            set_pin(&N2_valve, 1);
+            set_pin(&vent_valve, 0);
+            set_pin(&abort_valve, 0);
+            servoZero();
+            set_pin(&led, 1);
+            // It is now T-7, 5000ms until T-2.
+            k_timer_start(&TMinus2_timer, K_MSEC(5000), K_NO_WAIT);
         break;
 
         case STATE_IGNITION_3:
+            set_pin(&N2_valve, 1);
+            set_pin(&vent_valve, 0);
+            set_pin(&abort_valve, 0);
+            servoRotate(0.1 * 90.0); // TODO: What angle is 10%?
+            set_pin(&led, 1);
+            // It is now T-2, 2000ms until T-0.
+            k_timer_start(&TMinus0_timer, K_MSEC(2000), K_NO_WAIT);
             
         break;
- 
-        //T-0 Seconds
-        //servoRotate(90);
+
+        case STATE_IGNITION_4:
+            set_pin(&N2_valve, 1);
+            set_pin(&vent_valve, 0);
+            set_pin(&abort_valve, 0);
+            servoRotate(1.0 * 90.0); // TODO: What angle is 100%?
+            set_pin(&led, 1);
+            // It is now T-0, T+30 in 30000 ms
+            k_timer_start(&TPlus30_timer, K_MSEC(30000), K_NO_WAIT);
         break;
+
+        case STATE_SAFE:
+            set_pin(&N2_valve, 1);
+            set_pin(&vent_valve, 1);
+            set_pin(&abort_valve, 1);
+            servoRotate(1.0 * 90.0);
+            set_pin(&led, 1);
+        break;
+
+        case STATE_ABORT_BEFORE_COUNTDOWN:
+            set_pin(&N2_valve, 1);
+            set_pin(&vent_valve, 1);
+            set_pin(&abort_valve, 1);
+            servoZero();
+            set_pin(&led, 1);
+        break;
+
+        case STATE_ABORT_AFTER_COUNTDOWN:
+            set_pin(&N2_valve, 1);
+            set_pin(&vent_valve, 1);
+            set_pin(&abort_valve, 1);
+            servoRotate(1.0 * 90.0);
+            set_pin(&led, 1);
+        break;
+
     }
+
+    // TODO: What should we do if the sensing pins report no continuity?
+    // TODO: Send back response CAN messages? What should they say?
 }
 
 
@@ -269,12 +434,11 @@ int main(void)
 	}
     #endif
 
-    volatile uint8_t can_scratchpad[100];
-    can_scratchpad[0] = 0;
-    init_can(can_rx_cb, (void *) can_scratchpad);
+    init_can(can_rx_cb, NULL);
+    add_filter_can(can_rx_cb, filter, NULL);
+    add_filter_can(can_rx_override_cb, override_filter, NULL);
 
 
-	// k_msleep(SLEEP_TIME_MS);
 
     // data[0] = 39;
     // data[1] = 59;
@@ -289,31 +453,14 @@ int main(void)
     }
 
     
-    resetState();
-    set_pin(&N2_valve, 1);
-
 	while (1) {
 		// ret = gpio_pin_toggle_dt(&led);
 		// uint8_t senseState = pyroSense(0);
-        // // if(can_scratchpad[0])
-        // // LOG_INF("can_scratchpad[0]= %d", can_scratchpad[0]);
-
-		// if (senseState == 69) {
-		// 	printk("pyro0_sense failed");
-		// 	return 0;
-		// }
 
         if(trigger) {
             evaluateState();
             trigger = false;
         }
-        // set_pin(&led, can_scratchpad[0]);
-
-
-		// set_pin(&led, can_scratchpad[0] ? 1 : 0);
-		// LOG_INF("gpio_pin = %d and can_scratchpad[0]=%d 1 or 0 = %d", gpio_pin_get_dt(&led), can_scratchpad[0], can_scratchpad[0] ? 1 : 0);
-        // LOG_INF("can_scratchpad[0]= %d", can_scratchpad[0]);
-
 
 		k_msleep(50);
 	}
