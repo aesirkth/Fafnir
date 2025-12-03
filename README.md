@@ -1,8 +1,6 @@
 # Fafnir
 Propulsion Engine Controller
 
-
-
 # Prerequisites
 Follow [zephyr getting started guide](https://docs.zephyrproject.org/latest/develop/getting_started/index.html)
 
@@ -27,3 +25,22 @@ or
 ```bash
 west build -b native_sim/native/64 app -- -DEXTRA_CONF_FILE=debug.conf && ./build/zephyr/zephyr.exe
 ```
+
+## Using shell in simulation
+
+You can send can messages like this
+```bash
+uart: ~$ can send can_loopback0 ID DATA
+```
+
+For example, running
+```bash
+uart: ~$ can send can_loopback0 123 0
+```
+will tell Fafnir to go into state STATE_INIT.
+
+Running 
+```bash
+uart: ~$ can send can_loopback0 124 0 1
+```
+will use the override feature to set N2 Valve HIGH.

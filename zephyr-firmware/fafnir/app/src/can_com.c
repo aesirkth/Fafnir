@@ -94,7 +94,10 @@ int init_can() {
         return -1;
     }
 
+
+    #if defined(CONFIG_BOARD_NATIVE_SIM) 
     can_set_mode(can_dev, CAN_MODE_LOOPBACK);
+    #endif
     
 
     ret = can_set_bitrate(can_dev, 500000); // 500 kb/s
