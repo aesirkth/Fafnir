@@ -6,7 +6,7 @@ board_runner_args(openocd "--no-halt")
 
 board_runner_args(pyocd "--target=stm32u575zitx")
 
-board_runner_args(jlink "--device=STM32U575ZI" "--reset-after-load")
+board_runner_args(jlink "--device=STM32U575ZI" "--reset-after-load" "--speed=3300")
 
 include(${ZEPHYR_BASE}/boards/common/stm32cubeprogrammer.board.cmake)
 include(${ZEPHYR_BASE}/boards/common/openocd.board.cmake)

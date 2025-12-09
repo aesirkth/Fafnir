@@ -17,7 +17,7 @@
 		fdcan1 = &fdcan1;
 
 
-		rx_led = &rx_led;
+		rxled = &rx_led;
 
 		n2valve = &solenoid0;
 		ventvalve = &solenoid1;
