@@ -5,11 +5,7 @@
  */
 
 #include "can_com.h"
-
-#if defined(CONFIG_BOARD_NATIVE_SIM) 
 #include "gpio_emul_shell.h"
-#endif
-
 #include "main.h"
 
 #include <zephyr/logging/log.h>
@@ -25,34 +21,33 @@
 
 LOG_MODULE_REGISTER(main_func);
 
-static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_ALIAS(rxled), gpios);
+static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(DT_NODELABEL(led0), gpios);
 
 // Disable servo pwm if using board Native Sim 
-// #if !defined(CONFIG_BOARD_NATIVE_SIM) 
-// static const struct pwm_dt_spec pwm_servo = PWM_DT_SPEC_GET(DT_NODELABEL(servo));
-// #define SERVO_PERIOD PWM_MSEC(20)
-// #endif
+#if !defined(CONFIG_BOARD_NATIVE_SIM) 
+static const struct pwm_dt_spec pwm_servo = PWM_DT_SPEC_GET(DT_NODELABEL(servo));
+#define SERVO_PERIOD PWM_MSEC(20)
+#endif
 
 #if !defined(CONFIG_BOARD_NATIVE_SIM) 
 // TODO: Need to define alias for servo main_valve
-static const struct pwm_dt_spec pwm_servo = PWM_DT_SPEC_GET(DT_ALIAS(servo));
-#define SERVO_PERIOD PWM_MSEC(20)
+static const struct gpio_dt_spec main_valve = PWM_DT_SPEC_GET(DT_ALIAS(main_valve));
 #endif
 
 static const struct gpio_dt_spec N2_valve = GPIO_DT_SPEC_GET(DT_ALIAS(n2valve), gpios);
 static const struct gpio_dt_spec vent_valve = GPIO_DT_SPEC_GET(DT_ALIAS(ventvalve), gpios);
 static const struct gpio_dt_spec abort_valve = GPIO_DT_SPEC_GET(DT_ALIAS(abortvalve), gpios);
-static const struct gpio_dt_spec extra_valve = GPIO_DT_SPEC_GET(DT_ALIAS(extravalve), gpios);
+static const struct gpio_dt_spec ignition = GPIO_DT_SPEC_GET(DT_ALIAS(ignition), gpios);
 
-// static const struct gpio_dt_spec N2_sense = GPIO_DT_SPEC_GET(DT_ALIAS(n2sense), gpios);
-// static const struct gpio_dt_spec vent_sense = GPIO_DT_SPEC_GET(DT_ALIAS(ventsense), gpios);
-// static const struct gpio_dt_spec main_sense = GPIO_DT_SPEC_GET(DT_ALIAS(mainsense), gpios);
-// static const struct gpio_dt_spec abort_sense = GPIO_DT_SPEC_GET(DT_ALIAS(abortsense), gpios);
-// static const struct gpio_dt_spec ignition_sense = GPIO_DT_SPEC_GET(DT_ALIAS(ignitionsense), gpios);
+static const struct gpio_dt_spec N2_sense = GPIO_DT_SPEC_GET(DT_ALIAS(n2sense), gpios);
+static const struct gpio_dt_spec vent_sense = GPIO_DT_SPEC_GET(DT_ALIAS(ventsense), gpios);
+static const struct gpio_dt_spec main_sense = GPIO_DT_SPEC_GET(DT_ALIAS(mainsense), gpios);
+static const struct gpio_dt_spec abort_sense = GPIO_DT_SPEC_GET(DT_ALIAS(abortsense), gpios);
+static const struct gpio_dt_spec ignition_sense = GPIO_DT_SPEC_GET(DT_ALIAS(ignitionsense), gpios);
 
 #define NUM_CHANNELS 4
-// const struct gpio_dt_spec solenoidSense[NUM_CHANNELS] = {N2_sense, vent_sense, abort_sense, ignition_sense};
-const struct gpio_dt_spec pyroPins[NUM_CHANNELS] = {N2_valve, vent_valve, abort_valve, extra_valve};
+const struct gpio_dt_spec solenoidSense[NUM_CHANNELS] = {N2_sense, vent_sense, abort_sense, ignition_sense};
+const struct gpio_dt_spec pyroPins[NUM_CHANNELS] = {N2_valve, vent_valve, abort_valve, ignition};
 
 
 typedef enum {
@@ -154,15 +149,15 @@ void changeStateToSafeing_cb() {
     trigger = true;
 }
 
-// uint8_t pyroSense(uint8_t index) {
-// 	if (index >= NUM_PYROS) return 69; //69 means error
-//     //HIGH = continuity detected (return 1)
-//     //LOW = open circuit (return 0)
+uint8_t pyroSense(uint8_t index) {
+	if (index >= NUM_PYROS) return 69; //69 means error
+    //HIGH = continuity detected (return 1)
+    //LOW = open circuit (return 0)
 
-// 	int state = gpio_pin_get_dt(&solenoidSense[index]);
+	int state = gpio_pin_get_dt(&solenoidSense[index]);
 
-//     return state;
-// }
+    return state;
+}
 
 void servoZero(void) {
 	servoRotate(0.0f);
@@ -252,7 +247,7 @@ void can_rx_override_cb(const struct device *const device, struct can_frame *fra
         set_pin(&abort_valve, value);
         break;
     case 4:
-        set_pin(&extra_valve, value);
+        set_pin(&ignition, value);
         break;
     case 5:
         int8_t signed_value = (int8_t) value;
@@ -454,7 +449,7 @@ int main(void)
 
     for (size_t i = 0; i < NUM_CHANNELS; i++) {
         configure_output_pin(&pyroPins[i]);
-        // configure_input_pin(&solenoidSense[i]);
+        configure_input_pin(&solenoidSense[i]);
     }
 
     
