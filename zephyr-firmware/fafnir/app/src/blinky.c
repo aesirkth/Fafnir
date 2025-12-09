@@ -2,6 +2,7 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/pwm.h>
+#include "can_com.h"
 
 LOG_MODULE_REGISTER(blinky_test);
 
@@ -60,8 +61,23 @@ void configure_output_pin(const struct gpio_dt_spec *pin) {
     }
 }
 
-int main() {
+const struct can_filter override_filter = {
+    .flags = 0,
+    .id = 0x124,
+    // .mask = 0b11111111111 
+    .mask = 0x0
+};
 
+void can_rx_override_cb(const struct device *const device, struct can_frame *frame, void *user_data) {
+
+    // servoZero();
+    gpio_pin_toggle_dt(&led);
+    // servoRotate(90);
+    k_msleep(1001);
+    gpio_pin_toggle_dt(&led);
+}
+
+int main() {
     gpio_pin_configure_dt(&led, GPIO_OUTPUT);
     for (size_t i = 0; i < NUM_CHANNELS; i++) {
         configure_output_pin(&pyroPins[i]);
@@ -72,19 +88,22 @@ int main() {
 		       pwm_servo.dev->name);
 		return 0;
 	}
+
+    init_can();
+    add_filter_can(can_rx_override_cb, override_filter, NULL);
     
-    while(true) { 
-        servoZero();
-        gpio_pin_toggle_dt(&led);
+    while(true) {
+        // gpio_pin_toggle_dt(&led);
         // for (size_t i = 0; i < NUM_CHANNELS; i++) {
         //     gpio_pin_toggle_dt(&pyroPins[i]);
         // }
         gpio_pin_toggle_dt(&abort_valve);
         gpio_pin_toggle_dt(&extra_valve);
 
+        uint8_t data[3] = {5, 6, 7};
+        submit_can_pkt(data, 3);
         k_msleep(1001);
-        servoRotate(90);
-        k_msleep(1001);
+
     }
     
 

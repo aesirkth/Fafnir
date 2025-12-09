@@ -438,7 +438,7 @@ int main(void)
 	}
     #endif
 
-    init_can(can_rx_cb, NULL);
+    init_can();
     add_filter_can(can_rx_cb, filter, NULL);
     add_filter_can(can_rx_override_cb, override_filter, NULL);
 
