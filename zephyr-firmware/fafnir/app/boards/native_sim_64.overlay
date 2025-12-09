@@ -6,7 +6,7 @@
 		ventvalve = &solenoid1;
 		// mainvalve = &solenoid2;
 		abortvalve = &solenoid2;
-		ignition = &ignition0;
+		extravalve = &ignition0;
 
 		n2sense = &sense0;
 		ventsense = &sense1;

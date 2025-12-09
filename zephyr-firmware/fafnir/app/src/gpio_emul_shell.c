@@ -1,3 +1,4 @@
+#if defined(CONFIG_BOARD_NATIVE_SIM) 
 #include "gpio_emul_shell.h"
 #include <zephyr/shell/shell.h>
 #include <zephyr/drivers/gpio/gpio_emul.h>
@@ -80,3 +81,4 @@ static int cmd_set_emul_gpio_pins(const struct shell *sh, size_t argc, char **ar
 
 // SHELL_CMD_REGISTER(setsol, NULL, "bla", &cmd_display_emul_gpio_pins);
 SHELL_CMD_ARG_REGISTER(setsol, NULL, "bla", &cmd_set_emul_gpio_pins, 3, 0);
+#endif
