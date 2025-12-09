@@ -61,20 +61,42 @@ void configure_output_pin(const struct gpio_dt_spec *pin) {
     }
 }
 
-const struct can_filter override_filter = {
+const struct can_filter filter_off = {
     .flags = 0,
     .id = 0x124,
-    // .mask = 0b11111111111 
-    .mask = 0x0
+    .mask = 0b11111111111 
+    // .mask = 0x0
 };
 
-void can_rx_override_cb(const struct device *const device, struct can_frame *frame, void *user_data) {
+const struct can_filter filter_on = {
+    .flags = 0,
+    .id = 0x125,
+    .mask = 0b11111111111 
+    // .mask = 0x0
+};
+
+bool led_state = false;
+
+void can_rx_led_on_cb(const struct device *const device, struct can_frame *frame, void *user_data) {
+    led_state = true;
+    // gpio_pin_toggle_dt(&led);
 
     // servoZero();
-    gpio_pin_toggle_dt(&led);
-    // servoRotate(90);
-    k_msleep(1001);
-    gpio_pin_toggle_dt(&led);
+    // gpio_pin_toggle_dt(&led);
+    // // servoRotate(90);
+    // k_msleep(1001);
+    // gpio_pin_toggle_dt(&led);
+}
+
+void can_rx_led_off_cb(const struct device *const device, struct can_frame *frame, void *user_data) {
+    led_state = false;
+    // gpio_pin_toggle_dt(&led);
+
+    // servoZero();
+    // gpio_pin_toggle_dt(&led);
+    // // servoRotate(90);
+    // k_msleep(1001);
+    // gpio_pin_toggle_dt(&led);
 }
 
 int main() {
@@ -90,7 +112,8 @@ int main() {
 	}
 
     init_can();
-    add_filter_can(can_rx_override_cb, override_filter, NULL);
+    add_filter_can(can_rx_led_off_cb, filter_off, NULL);
+    add_filter_can(can_rx_led_on_cb, filter_on, NULL);
     
     while(true) {
         // gpio_pin_toggle_dt(&led);
@@ -99,6 +122,7 @@ int main() {
         // }
         gpio_pin_toggle_dt(&abort_valve);
         gpio_pin_toggle_dt(&extra_valve);
+        gpio_pin_set_dt(&led, led_state);
 
         uint8_t data[3] = {5, 6, 7};
         submit_can_pkt(data, 3);
