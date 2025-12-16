@@ -46,19 +46,19 @@
         compatible = "gpio-leds";
         
         solenoid0: sol_0 {
-			gpios = <&gpioa 12 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpioa 9 GPIO_ACTIVE_HIGH>;
 		};
 
 		solenoid1: sol_1 {
-			gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>;
-		};
-
-		solenoid2: sol_2 {
 			gpios = <&gpioa 10 GPIO_ACTIVE_HIGH>;
 		};
 
+		solenoid2: sol_2 {
+			gpios = <&gpioa 11 GPIO_ACTIVE_HIGH>;
+		};
+
 		solenoid3: sol_3 {
-			gpios = <&gpioa 9 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpioa 12 GPIO_ACTIVE_HIGH>;
 		};
 
 	};

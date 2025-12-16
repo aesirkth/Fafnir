@@ -76,31 +76,31 @@ bool trigger = true;
 bool isStateBeforeCountdown(State_t state) {
     switch (state) {
     case STATE_IDLE:
-        return false;
+        return true;
     case STATE_INIT:
-        return false;
+        return true;
     case STATE_FILL:
-        return false;
+        return true;
     case STATE_STOP_FILL:
-        return false;
+        return true;
     case STATE_UMBILICAL:
-        return false;
+        return true;
     case STATE_N2_PRESSURIZATION:
-        return false;
+        return true;
     case STATE_IGNITION_1:
-        return false;
+        return true;
     case STATE_IGNITION_2:
-        return false;
+        return true;
     case STATE_IGNITION_3:
-        return true; // TODO: What counts as "before countdown"?
+        return false; // TODO: What counts as "before countdown"?
     case STATE_IGNITION_4:
-        return true;
+        return false;
     case STATE_SAFE:
-        return true;
+        return false;
     case STATE_ABORT_BEFORE_COUNTDOWN:
-        return true;
+        return false;
     case STATE_ABORT_AFTER_COUNTDOWN:
-        return true;
+        return false;
     }
     LOG_ERR("Invalid state passed!");
     return true;
@@ -211,7 +211,7 @@ void can_rx_cb(const struct device *const device, struct can_frame *frame, void 
     size_t message_data = frame->data[0];
     State_t message_state = state_can_id_map[message_data];
 
-    if (message_state == STATE_ABORT_BEFORE_COUNTDOWN) {
+    if (message_state == STATE_ABORT_BEFORE_COUNTDOWN) { // STATE_ABORT_BEFORE_COUNTDOWN represents any abort
         if(isStateBeforeCountdown(systemState)) {
             systemState = STATE_ABORT_BEFORE_COUNTDOWN;
         } else {
@@ -247,13 +247,13 @@ void can_rx_override_cb(const struct device *const device, struct can_frame *fra
     case 1:
         set_pin(&vent_valve, value);
         break;
-    case 3:
+    case 2:
         set_pin(&abort_valve, value);
         break;
-    case 4:
+    case 3:
         set_pin(&extra_valve, value);
         break;
-    case 5:
+    case 4:
         int8_t signed_value = (int8_t) value;
         servoRotate(90.0 * ((double) signed_value/127.0) );
         break;
@@ -466,7 +466,9 @@ int main(void)
             trigger = false;
         }
 
-		k_msleep(50);
+        uint8_t data[3] = {2, 3, 4};
+        submit_can_pkt(data, 3);
+		k_msleep(1000);
 	}
 	return 0;
 }
