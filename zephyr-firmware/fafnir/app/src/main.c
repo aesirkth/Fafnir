@@ -92,7 +92,7 @@ bool isStateBeforeCountdown(State_t state) {
     case STATE_IGNITION_2:
         return true;
     case STATE_IGNITION_3:
-        return false; // TODO: What counts as "before countdown"?
+        return false; // Double checked with xiao
     case STATE_IGNITION_4:
         return false;
     case STATE_SAFE:
