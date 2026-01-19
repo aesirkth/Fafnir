@@ -242,20 +242,20 @@ void can_rx_override_cb(const struct device *const device, struct can_frame *fra
     LOG_INF("Recieved CAN message rx: %#X: frame->dlc: %d. Setting pin[%d] := %d", frame->id, frame->dlc, pin, value);
     switch (pin) {
     case 0:
-        set_pin(&N2_valve, value);
+        int8_t signed_value = (int8_t) value;
+        servoRotate(90.0 * ((double) signed_value/127.0) );
         break;
     case 1:
-        set_pin(&vent_valve, value);
+        set_pin(&extra_valve, value);
         break;
     case 2:
         set_pin(&abort_valve, value);
         break;
     case 3:
-        set_pin(&extra_valve, value);
+        set_pin(&vent_valve, value);
         break;
     case 4:
-        int8_t signed_value = (int8_t) value;
-        servoRotate(90.0 * ((double) signed_value/127.0) );
+        set_pin(&N2_valve, value);
         break;
 
     }
