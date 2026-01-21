@@ -106,6 +106,40 @@ bool isStateBeforeCountdown(State_t state) {
     return true;
 }
 
+bool isStateIgnition(State_t state) {
+    switch (state) {
+    case STATE_IDLE:
+        return false;
+    case STATE_INIT:
+        return false;
+    case STATE_FILL:
+        return false;
+    case STATE_STOP_FILL:
+        return false;
+    case STATE_UMBILICAL:
+        return false;
+    case STATE_N2_PRESSURIZATION:
+        return false;
+    case STATE_IGNITION_1:
+        return true;
+    case STATE_IGNITION_2:
+        return true;
+    case STATE_IGNITION_3:
+        return true;
+    case STATE_IGNITION_4:
+        return true;
+    case STATE_SAFE:
+        return false;
+    case STATE_ABORT_BEFORE_COUNTDOWN:
+        return false;
+    case STATE_ABORT_AFTER_COUNTDOWN:
+        return false;
+    }
+    LOG_ERR("Invalid state passed!");
+    return false;
+}
+
+
 /* 
  * A CAN message with `data`, is interpreted as a command meaning:
  * "Change your state to `state_can_id_map[data]`".
@@ -203,13 +237,23 @@ void can_rx_cb(const struct device *const device, struct can_frame *frame, void 
         LOG_ERR("received packet with id %d has length %d. Fafnir expects all packets to have size 1.", frame->id, frame->dlc);
     }
 
-    if(systemState == STATE_ABORT_BEFORE_COUNTDOWN || systemState == STATE_ABORT_AFTER_COUNTDOWN) {
-        LOG_ERR("CAN message recieved but ignored because system is aborted.");
-        return;
-    }
+    // if(systemState == STATE_ABORT_BEFORE_COUNTDOWN || systemState == STATE_ABORT_AFTER_COUNTDOWN) {
+    //     LOG_ERR("CAN message recieved but ignored because system is aborted.");
+    //     return;
+    // }
+
 
     size_t message_data = frame->data[0];
+
+    if (!(0 <= message_data && message_data <= 7)) {
+        return;
+    }
     State_t message_state = state_can_id_map[message_data];
+
+
+    if (isStateIgnition(systemState) && message_state == STATE_IGNITION_1) {
+        return;
+    }
 
     if (message_state == STATE_ABORT_BEFORE_COUNTDOWN) { // STATE_ABORT_BEFORE_COUNTDOWN represents any abort
         if(isStateBeforeCountdown(systemState)) {
@@ -235,6 +279,7 @@ void can_rx_override_cb(const struct device *const device, struct can_frame *fra
 
     if (frame->dlc != 2) {
         LOG_ERR("received packet with id %d has length %d. Override requires 2 arguments PIN, VALUE.", frame->id, frame->dlc);
+        return;
     }
     size_t pin = frame->data[0];
     size_t value = frame->data[1];
@@ -257,7 +302,9 @@ void can_rx_override_cb(const struct device *const device, struct can_frame *fra
     case 4:
         set_pin(&N2_valve, value);
         break;
-
+    default:
+        LOG_ERR("Invalid pin!");
+        break;
     }
 }
 
@@ -377,7 +424,7 @@ void evaluateState() {
             set_pin(&N2_valve, 1);
             set_pin(&vent_valve, 0);
             set_pin(&abort_valve, 0);
-            servoRotate(0.1 * 90.0); // TODO: What angle is 10%?
+            servoRotate(30.0); // TODO: What angle is 10%?
             set_pin(&led, 1);
             // It is now T-2, 2000ms until T-0.
             k_timer_start(&TMinus0_timer, K_MSEC(2000), K_NO_WAIT);
