@@ -60,5 +60,6 @@ Mjollnir only has two solenoids which correspond to:
 ```
 Solenoid ID 2 => Bypass valve
 Solenoid ID 3 => Pilot valve
+Solenoid ID 4 => Control vent
 ```
 Solenoid IDs 1 and 4 are not connected and don't do anything.
