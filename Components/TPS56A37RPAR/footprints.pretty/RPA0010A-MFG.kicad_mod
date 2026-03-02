@@ -1,0 +1,502 @@
+(footprint "RPA0010A-MFG"
+	(version 20241229)
+	(generator "pcbnew")
+	(generator_version "9.0")
+	(layer "F.Cu")
+	(tags "TPS56A37RPAR ")
+	(property "Reference" "REF**"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "f4594dfa-cfc0-4147-95aa-df93fbbbac7b")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "RPA0010A-MFG"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "4f28b9ab-1450-4ad1-8003-db7d008ed777")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "f52f4dde-a2f4-4339-b66d-6ac008af2392")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0c68f650-8191-400e-88fe-4ecad11ab082")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Height" "1"
+		(at 0.1 4.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "62d900b1-d9c7-4671-8548-882aa4d92963")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Mouser Part Number" "595-TPS56A37RPAR"
+		(at 0.1 4.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "e095b2fd-b110-4c65-9984-00a1ed3bbf2f")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Texas-Instruments/TPS56A37RPAR?qs=dbcCsuKDzFV3BmG4b9YeGQ%3D%3D"
+		(at 0.1 4.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "1bd4dc5e-29aa-4a8c-98a8-e8156bab3134")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Manufacturer_Name" "Texas Instruments"
+		(at 0.1 4.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "7da5a56e-3b41-4ed6-bd0c-0aea41b4fab2")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Manufacturer_Part_Number" "TPS56A37RPAR"
+		(at 0.1 4.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "118998ff-c788-4740-bee4-6954aff0688b")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Height" "1"
+		(at 0.1 0.3 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "46ecb7de-f287-46ec-a2d3-6ec646487238")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Mouser Part Number" "595-TPS56A37RPAR"
+		(at 0.1 0.3 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "487a4c95-c9cb-4d70-9b24-5ab90713c7ba")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Mouser Price/Stock" "https://www.mouser.co.uk/ProductDetail/Texas-Instruments/TPS56A37RPAR?qs=dbcCsuKDzFV3BmG4b9YeGQ%3D%3D"
+		(at 0.1 0.3 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "6623b52b-f813-46bb-a26b-27b5f89a9beb")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Manufacturer_Name" "Texas Instruments"
+		(at 0.1 0.3 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "87ce1bab-e48a-44e3-bf1b-2850296e7dbc")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Manufacturer_Part_Number" "TPS56A37RPAR"
+		(at 0.1 0.3 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "0506e300-65ef-42dd-8b0a-f9ed296baa7e")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(fp_line
+		(start -2 -0.45)
+		(end -2 -0.45)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "75b36078-8de0-4585-9394-e330d48fda5e")
+	)
+	(fp_line
+		(start -1.9 -0.45)
+		(end -1.9 -0.45)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "80d25ead-466b-4312-8e9e-b2e43a211a21")
+	)
+	(fp_line
+		(start -1.4 -1.2)
+		(end -1.15 -1.2)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "07a3f584-4b1f-4f9f-9c2e-49f60a4cf4db")
+	)
+	(fp_line
+		(start -1.4 -1.1)
+		(end -1.4 -1.2)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "f28e7412-a6a3-453a-ba92-e610bb4e89d5")
+	)
+	(fp_line
+		(start -1.4 -0.95)
+		(end -1.4 -1.1)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "be53d8dc-f77c-4d60-bcdc-dfe53e56bc47")
+	)
+	(fp_line
+		(start -1.4 1.55)
+		(end -1.4 1.8)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "cb6fae17-a785-49ab-bae6-7ebd120e6e60")
+	)
+	(fp_line
+		(start -1.4 1.8)
+		(end -1.15 1.8)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "8bc8d175-ffb1-4d8a-9d63-6afbdb9027f4")
+	)
+	(fp_line
+		(start -0.4 1.8)
+		(end 0.1 1.8)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "db796f03-a6bb-45fe-afc6-98ce73e5f48f")
+	)
+	(fp_line
+		(start 0.6 -1.2)
+		(end 0.35 -1.2)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "4f6ecada-fcda-415f-8f7e-c4ba6f094853")
+	)
+	(fp_line
+		(start 1.6 -1.2)
+		(end 1.6 -0.95)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "d3d37317-93c3-4074-be25-079da9f1e782")
+	)
+	(fp_line
+		(start 1.6 1.8)
+		(end 1.6 1.15)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "0c7d3026-cc0a-45cf-8072-c6327392f187")
+	)
+	(fp_arc
+		(start -2 -0.45)
+		(mid -1.95 -0.5)
+		(end -1.9 -0.45)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "52715341-ad4c-4d30-a2b0-c2fbef710764")
+	)
+	(fp_arc
+		(start -1.9 -0.45)
+		(mid -1.95 -0.4)
+		(end -2 -0.45)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "619f30b2-cc25-46c5-b6b7-11d57ea4c372")
+	)
+	(fp_line
+		(start -2.31 -2.1)
+		(end 2.49 -2.1)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "a898f6a8-de01-463e-8af6-67e7b02986fb")
+	)
+	(fp_line
+		(start -2.31 2.7)
+		(end -2.31 -2.1)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "7eb9dbb8-ff46-4d66-b379-a2033a01b9ff")
+	)
+	(fp_line
+		(start 2.49 -2.1)
+		(end 2.49 2.7)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "2fb2c0b3-9a5d-4604-82df-7e917d32eec0")
+	)
+	(fp_line
+		(start 2.49 2.7)
+		(end -2.31 2.7)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.CrtYd")
+		(uuid "6817bee9-efc3-4215-b908-6c2411e85847")
+	)
+	(fp_line
+		(start -1.4 -1.2)
+		(end 1.6 -1.2)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "7b9dc1f0-a421-487f-9209-ad369e150450")
+	)
+	(fp_line
+		(start -1.4 1.8)
+		(end -1.4 -1.2)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "20350a99-7886-4a0d-8128-c7f562b2982b")
+	)
+	(fp_line
+		(start 1.6 -1.2)
+		(end 1.6 1.8)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "ce3e0d94-46cc-4af2-b542-28065ebe9357")
+	)
+	(fp_line
+		(start 1.6 1.8)
+		(end -1.4 1.8)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "66870fc2-e07a-4a98-9f36-1220c55ea18d")
+	)
+	(fp_text user "Designator8"
+		(at -3.9 -3.6 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "df5ccb13-77e9-4a98-b877-334b62708fdd")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(fp_text user "${REFERENCE}"
+		(at 0.09 0.3 0)
+		(layer "F.Fab")
+		(uuid "a6594474-3b21-44bf-8475-45406fbb5254")
+		(effects
+			(font
+				(size 1.27 1.27)
+				(thickness 0.254)
+			)
+		)
+	)
+	(pad "1" smd rect
+		(at -1.31 -0.45 90)
+		(size 0.25 0.6)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "6b42fe2b-29e5-4fff-9698-5089999ac4b2")
+	)
+	(pad "2" smd rect
+		(at -1.31 0.05 90)
+		(size 0.25 0.6)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "bed5235f-4e6f-48db-8c94-0a14f22b9352")
+	)
+	(pad "3" smd rect
+		(at -1.31 0.55 90)
+		(size 0.25 0.6)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "4c443b4c-8ccc-49c1-af29-fc04859447bb")
+	)
+	(pad "4" smd rect
+		(at -1.31 1.05 90)
+		(size 0.25 0.6)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "7b315415-c8da-4e96-8b26-a8f912917515")
+	)
+	(pad "5" smd rect
+		(at -0.84 1.7)
+		(size 0.25 0.6)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "43d897e8-7cad-472f-aaee-fa70dcb0a94d")
+	)
+	(pad "6" smd rect
+		(at 0.46 1.15)
+		(size 0.25 1.7)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "d620af7c-d1dc-4122-8c24-3f29d7991dfa")
+	)
+	(pad "7" smd rect
+		(at 0.96 1.7)
+		(size 0.25 0.6)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "581a06e6-32bd-4e95-b5b7-1c4e6e1ca7dd")
+	)
+	(pad "8" smd rect
+		(at 1.04 -0.35)
+		(size 0.4 2.1)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "65e0dd62-ab87-4b37-81ec-8fade1b42fb7")
+	)
+	(pad "9" smd rect
+		(at -0.12 -0.35)
+		(size 0.4 2.1)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "8ef857c8-7f22-4ac0-8604-56e48d3601c1")
+	)
+	(pad "10" smd rect
+		(at -0.84 -1.1)
+		(size 0.25 0.6)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "15e0fb56-d715-4b2b-8571-e97c96814c77")
+	)
+	(pad "11" smd rect
+		(at 1.51 0.55 90)
+		(size 0.25 0.56)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "a6f9f806-c2e7-4387-b87b-a1599d5b00e0")
+	)
+	(pad "12" smd rect
+		(at 1.51 0.05 90)
+		(size 0.25 0.56)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "a420c506-8296-4f22-85ec-045195512e33")
+	)
+	(pad "13" smd rect
+		(at 1.51 -0.45 90)
+		(size 0.25 0.56)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "eb0773f2-d4e3-4b89-89a9-f492e8fbea8c")
+	)
+	(embedded_fonts no)
+)
