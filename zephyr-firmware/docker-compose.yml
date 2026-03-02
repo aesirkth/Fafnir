@@ -1,0 +1,9 @@
+services:
+  fafnir:
+    build: .
+      
+    container_name: fafnir-sim
+    
+    # Optional: Mount the current host directory into the container for development
+    volumes:
+      - .:/app

@@ -1,0 +1,89 @@
+/ {
+	aliases {
+		fdcan1 = &can_loopback0;
+
+		n2valve = &solenoid0;
+		ventvalve = &solenoid1;
+		// mainvalve = &solenoid2;
+		abortvalve = &solenoid2;
+		extravalve = &ignition0;
+
+		n2sense = &sense0;
+		ventsense = &sense1;
+		mainsense = &sense2;
+		abortsense = &sense3;
+		ignitionsense = &sense4;
+		solenoids = &solenoids;
+		gpio0 = &gpio0;
+	};
+
+
+    leds {
+        compatible = "gpio-leds";
+        
+        led0: led_0 {
+			gpios = <&gpio0 10 GPIO_ACTIVE_HIGH>;
+			label = "Green LED 0";
+		};
+    };
+
+	solenoids: solenoids {
+        compatible = "gpio-leds";
+        
+        solenoid0: sol_0 {
+			gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
+			label = "N2 Valve";
+		};
+
+		solenoid1: sol_1 {
+			gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
+			label = "Vent Valve";
+		};
+
+		// solenoid2: sol_2 {
+		// 	gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+		// 	label = "Main Valve";
+		// };
+
+		solenoid2: sol_2 {
+			gpios = <&gpio0 3 GPIO_ACTIVE_HIGH>;
+			label = "Abort Valve";
+		};
+
+		ignition0: ign_0 {
+			gpios = <&gpio0 4 GPIO_ACTIVE_HIGH>;
+			label = "Ignition";
+		};
+
+};
+
+	solenoidSense {
+        compatible = "gpio-keys";
+        
+        sense0: sense_0 {
+			gpios = <&gpio0 5 GPIO_ACTIVE_LOW>;
+			label = "N2 Sense";
+		};
+
+		sense1: sense_1 {
+			gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
+			label = "Vent Sense";
+		};
+
+		sense2: sense_2 {
+			gpios = <&gpio0 7 GPIO_ACTIVE_LOW>;
+			label = "Main Sense";
+		};
+		
+		sense3: sense_3 {
+			gpios = <&gpio0 8 GPIO_ACTIVE_LOW>;
+			label = "Abort Sense";
+		};
+		
+		sense4: sense_4 {
+			gpios = <&gpio0 9 GPIO_ACTIVE_LOW>;
+			label = "Ignitino Sense";
+		};
+	};
+
+};

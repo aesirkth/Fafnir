@@ -5,6 +5,8 @@
 extern "C" {
 #endif
 
+#include <stdint.h>
+
 #define NUM_PYROS 3
 
 // extern GPIO_TypeDef* const pyroPort;
