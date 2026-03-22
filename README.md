@@ -80,8 +80,7 @@ Solenoid IDs 1 and 4 are not connected and don't do anything.
 | 0x125  | 0   | 0xF3    | Invalid override command |
 | 0x125  | 0   | 0xF4    | Invalid pin given in override command |
 
-
-where `systemState` is of type: Note this is different to the launch sequence numbers from above.
+The state we're changing to is of type equal to this C `enum`:
 ```c
 typedef enum {
     STATE_IDLE,
@@ -100,3 +99,4 @@ typedef enum {
 } State_t;
 ```
 
+Note that this is **NOT** the same as the launch sequence number used in the command above (0x123).
