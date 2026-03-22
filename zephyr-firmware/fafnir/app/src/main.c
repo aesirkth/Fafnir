@@ -235,6 +235,9 @@ void can_rx_cb(const struct device *const device, struct can_frame *frame, void 
 
     if (frame->dlc != 1) {
         LOG_ERR("received packet with id %d has length %d. Fafnir expects all packets to have size 1.", frame->id, frame->dlc);
+        uint8_t data[1] = {0xF2}; // Incorrect message format
+        submit_can_pkt(data, 1);
+        return;
     }
 
     // if(systemState == STATE_ABORT_BEFORE_COUNTDOWN || systemState == STATE_ABORT_AFTER_COUNTDOWN) {
@@ -246,12 +249,16 @@ void can_rx_cb(const struct device *const device, struct can_frame *frame, void 
     size_t message_data = frame->data[0];
 
     if (!(0 <= message_data && message_data <= 7)) {
+        uint8_t data[1] = {0xF0}; // Incorrect state
+        submit_can_pkt(data, 1);
         return;
     }
     State_t message_state = state_can_id_map[message_data];
 
 
     if (isStateIgnition(systemState) && message_state == STATE_IGNITION_1) {
+        uint8_t data[2] = {0xF1, frame->data[0]}; // Cannot perform ignition command while in ignition state.
+        submit_can_pkt(data, 2);
         return;
     }
 
@@ -268,6 +275,7 @@ void can_rx_cb(const struct device *const device, struct can_frame *frame, void 
     LOG_INF("Recieved CAN message rx: %#X: frame->dlc: %d. Switching state to %d", frame->id, frame->dlc, systemState);
 
     trigger = true;
+
 }
 
 const struct can_filter override_filter = {
@@ -279,6 +287,8 @@ void can_rx_override_cb(const struct device *const device, struct can_frame *fra
 
     if (frame->dlc != 2) {
         LOG_ERR("received packet with id %d has length %d. Override requires 2 arguments PIN, VALUE.", frame->id, frame->dlc);
+        uint8_t data[1] = {0xF3}; // Incorrect override message format!
+        submit_can_pkt(data, 1);
         return;
     }
     size_t pin = frame->data[0];
@@ -304,8 +314,14 @@ void can_rx_override_cb(const struct device *const device, struct can_frame *fra
         break;
     default:
         LOG_ERR("Invalid pin!");
+        uint8_t data[3] = {0xF4, frame->data[0], frame->data[1]}; // Incorrect pin!
+        submit_can_pkt(data, 3);
+        return;
         break;
     }
+    LOG_ERR("Invalid pin!");
+    uint8_t data[3] = {0x02, frame->data[0], frame->data[1]}; // Succesffuly received override command
+    submit_can_pkt(data, 3);
 }
 
 static uint8_t data[2];
@@ -349,6 +365,8 @@ K_TIMER_DEFINE(TPlus30_timer, changeStateToSafeing_cb, NULL);
 
 void evaluateState() { 
     LOG_INF("Evaluating state: %d", systemState);
+    uint8_t data[2] = {0x01, systemState};
+    submit_can_pkt(data, 2); // Changing state acknowledge!
     switch(systemState) {
         case STATE_IDLE:
             set_pin(&N2_valve, 0);
@@ -497,7 +515,6 @@ int main(void)
 
     configure_output_pin(&led);
 
-
     for (size_t i = 0; i < NUM_CHANNELS; i++) {
         configure_output_pin(&pyroPins[i]);
         // configure_input_pin(&solenoidSense[i]);
@@ -513,9 +530,9 @@ int main(void)
             trigger = false;
         }
 
-        uint8_t data[3] = {2, 3, 4};
-        submit_can_pkt(data, 3);
-		k_msleep(1000);
+        // uint8_t data[3] = {2, 3, 4};
+        // submit_can_pkt(data, 3);
+		k_msleep(10);
 	}
 	return 0;
 }

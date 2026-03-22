@@ -9,5 +9,5 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 
 project(app LANGUAGES C)
 
-target_sources(app PRIVATE src/main.c src/can_com.c src/gpio_emul_shell.c)
+target_sources(app PRIVATE src/main.c src/can_com.c src/gpio_emul_shell.c src/heartbeat.c)
 # target_sources(app PRIVATE src/blinky.c src/can_com.c src/gpio_emul_shell.c)
